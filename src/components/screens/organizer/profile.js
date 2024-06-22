@@ -8,12 +8,12 @@ import {
   Image,
   TextInput,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // Import Ionicons for the burger icon
+import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
 import NavBar from './nav';
 
 const Profile = () => {
-  const navigation = useNavigation(); // Hook to use navigation
+  const navigation = useNavigation();
 
   const [profile, setProfile] = useState({
     name: 'Organizer',
@@ -42,13 +42,11 @@ const Profile = () => {
         <Ionicons name="menu" size={32} color="white" />
       </TouchableOpacity>
       
-      {/* Profile Picture */}
       <Image
         source={require('../../../../assets/profile-picture.jpg')}
         style={styles.profilePicture}
       />
       
-      {/* Profile Content */}
       <View style={styles.profileContainer}>
         <Text style={styles.nameText}>{profile.name}</Text>
         <View style={styles.fieldContainer}>
@@ -136,7 +134,6 @@ const Profile = () => {
         
       </View>
 
-      {/* Bottom Navbar */}
       <NavBar />
     </ScrollView>
   );

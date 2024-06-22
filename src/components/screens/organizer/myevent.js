@@ -10,9 +10,8 @@ import pic from '../../../../assets/pic.png';
 import styles from '../../Styles/style';
 
 const MyEventScreen = () => {
-  const navigation = useNavigation(); // Use useNavigation hook to get navigation object
+  const navigation = useNavigation(); 
 
-  // Navigation function to navigate to EditScreen
   const navigateToEditScreen = () => {
     console.log('Navigating to EditScreen');
     navigation.navigate('EditScreen');

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, Modal } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // Import Ionicons for the burger icon
+import { Ionicons } from '@expo/vector-icons'; 
 
 const EditScreen = ({ navigation }) => {
   const [showRemoveGuest, setShowRemoveGuest] = useState(false);
@@ -111,11 +111,11 @@ const EditScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#000', // Background color of the entire screen
-    flex: 1, // Ensure the container fills the entire screen
+    backgroundColor: '#000', 
+    flex: 1, 
   },
   eventContainer: {
-    marginTop: 80, // Adjust this value to leave space below the menu button
+    marginTop: 80, 
     paddingHorizontal: 20,
   },
   eventNameText: {
@@ -129,16 +129,16 @@ const styles = StyleSheet.create({
     borderColor: 'black',
     borderRadius: 5,
     marginBottom: 10,
-    maxWidth: '90%', // Limiting the width to 90% of the parent container
+    maxWidth: '90%',
   },
   eventInfo: {
-    backgroundColor: 'white', // Change background color of the rectangles to white
+    backgroundColor: 'white', 
   },
   eventDescription: {
-    color: 'black', // Change text color to black
+    color: 'black', 
     fontSize: 16,
     textAlign: 'center',
-    flexWrap: 'wrap', // Allow text to wrap within the rectangle
+    flexWrap: 'wrap',
   },
   locationNameText: {
     fontSize: 24,
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
   invitedText: {
     fontSize: 16,
     marginBottom: 5,
-    color: 'black', // Change text color to black
+    color: 'black', 
   },
   imageContainer: {
     alignItems: 'center',

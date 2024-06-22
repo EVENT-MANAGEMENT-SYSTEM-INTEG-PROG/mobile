@@ -88,7 +88,6 @@ const Notifications = () => {
     </TouchableOpacity>
   );
 
-  // Return JSX
   return (
     <View style={styles.container}>
       {/* Burger icon to open sidebar */}
@@ -96,10 +95,8 @@ const Notifications = () => {
         <Ionicons name="menu" size={32} color="white" />
       </TouchableOpacity>
 
-      {/* Spacer below the burger icon */}
       <View style={styles.spacer} />
 
-      {/* FlatList to render notifications */}
       <FlatList
         data={notifications}
         renderItem={renderNotification}
@@ -107,7 +104,6 @@ const Notifications = () => {
         contentContainerStyle={{ paddingBottom: 60 }} // Adjusted to leave space for bottom navbar
       />
 
-      {/* Modal for selected notification */}
       {selectedNotification && (
         <Modal
           visible={true}
@@ -143,7 +139,7 @@ const Notifications = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000', // Background color of the screen
+    backgroundColor: '#000', 
   },
   menuButton: {
     position: 'absolute',
@@ -152,7 +148,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   spacer: {
-    height: 80, // Adjust the height as needed to create space between burger icon and notifications
+    height: 80, 
   },
   notificationItem: {
     backgroundColor: '#fff',

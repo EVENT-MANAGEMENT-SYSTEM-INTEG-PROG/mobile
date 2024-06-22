@@ -1,14 +1,13 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // Import Ionicons for the burger icon
+import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
-import { Agenda } from 'react-native-calendars'; // Import Agenda from react-native-calendars
+import { Agenda } from 'react-native-calendars'; 
 import NavBar from './nav';
 
 const ViewSched = () => {
-  const navigation = useNavigation(); // Hook to use navigation
+  const navigation = useNavigation(); 
 
-  // Define your agenda items
   const items = {
     '2024-06-18': [{ name: 'Meeting 1', data: 'Lorem ipsum, or lipsum as it is sometimes known, is dummy text used in laying out print, graphic or web designs.' }],
     '2024-06-19': [{ name: 'Meeting 2', data: 'Lorem ipsum, or lipsum as it is sometimes known, is dummy text used in laying out print, graphic or web designs.' }],
@@ -28,7 +27,6 @@ const ViewSched = () => {
       <Text style={styles.header}> </Text>
       <Text style={styles.text}> </Text>
 
-      {/* Agenda component */}
       <SafeAreaView style={styles.agendaContainer}>
         <Agenda
           items={items}

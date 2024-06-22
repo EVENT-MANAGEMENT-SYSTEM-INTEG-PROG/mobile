@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, TouchableOpacity, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import styles from '../../Styles/style'; // Make sure to have styles for this component
+import { useNavigation, useRoute } from '@react-navigation/native';
+import styles from '../../Styles/style'; // Import your styles
 
 const NavBar = () => {
   const navigation = useNavigation();
-  const [selectedTab, setSelectedTab] = useState('Home');
+  const route = useRoute();
+  const [selectedTab, setSelectedTab] = useState('Dashboard');
 
-  // Define a mapping of tab names to screen names
   const tabScreenMapping = {
-    Home: 'Main',
+    Dashboard: 'Dashboard',
     Event: 'Event',
     Services: 'Services',
     Schedule: 'Schedule',
@@ -18,18 +18,26 @@ const NavBar = () => {
     Contact: 'Contact'
   };
 
+  // Effect to update selectedTab based on route changes
+  useEffect(() => {
+    const currentRouteName = route.name;
+    if (currentRouteName && tabScreenMapping[currentRouteName] && selectedTab !== currentRouteName) {
+      setSelectedTab(currentRouteName);
+    }
+  }, [route, tabScreenMapping]);
+
+  // Handle tab press
   const handleTabPress = (tab) => {
-    if (selectedTab !== tab) {
-      setSelectedTab(tab); // Update the state immediately
-      const screenName = tabScreenMapping[tab];
-      if (screenName) {
-        navigation.navigate(screenName); // Navigate to the appropriate screen
-      }
+    setSelectedTab(tab);
+    const screenName = tabScreenMapping[tab];
+    if (screenName) {
+      navigation.navigate(screenName);
     }
   };
 
+  // Define tabs
   const tabs = [
-    { name: 'Home', icon: 'home' },
+    { name: 'Dashboard', icon: 'home' },
     { name: 'Event', icon: 'calendar' },
     { name: 'Services', icon: 'construct' },
     { name: 'Schedule', icon: 'time' },

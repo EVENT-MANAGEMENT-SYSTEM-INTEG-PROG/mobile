@@ -105,10 +105,10 @@ const styles = StyleSheet.create({
       },
       topSection: {
         alignItems: 'center',
-        paddingTop: 50, // Adjust top padding to center content properly
+        paddingTop: 50, 
       },
       addButton: {
-        marginBottom: 20, // Adjust margin as needed
+        marginBottom: 20, 
       },
       buttonGradient: {
         paddingVertical: 10,
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
       eventInfo: {
         flexDirection: 'row',
         alignItems: 'flex-start',
-        backgroundColor: 'white', // Background color changed to white
+        backgroundColor: 'white', 
         borderRadius: 10,
         padding: 10,
         marginBottom: 20,
@@ -132,14 +132,14 @@ const styles = StyleSheet.create({
       image: {
         width: 150,
         height: 150,
-        borderRadius: 10, // Adjust border radius as needed
+        borderRadius: 10, 
       },
       textContainer: {
         marginLeft: 10,
         flex: 1,
       },
       eventTitle: {
-        color: 'black', // Text color changed to black
+        color: 'black', 
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 5,
@@ -158,22 +158,22 @@ const styles = StyleSheet.create({
         marginRight: 5,
       },
       detailText: {
-        color: 'black', // Text color changed to black
+        color: 'black', 
         fontSize: 14,
       },
       text: {
         fontSize: 24,
         fontWeight: 'bold',
         marginTop: 30,
-        marginBottom: 10, // Adjust spacing between "MY EVENT" and the button
+        marginBottom: 10, 
       },
       editButton: {
         marginTop: 30,
-        paddingHorizontal: 15, // Adjusted paddingHorizontal for narrower button
+        paddingHorizontal: 15, 
       },
       scrollViewContent: {
-        flexGrow: 1, // Ensure content takes up full height of ScrollView
-        paddingBottom: 20, // Padding to prevent bottom content from being hidden
+        flexGrow: 1, 
+        paddingBottom: 20, 
       },
 });
 

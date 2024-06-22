@@ -4,10 +4,8 @@ import { Ionicons } from '@expo/vector-icons'; // Import Ionicons for the burger
 import { useNavigation } from '@react-navigation/native';
 import NavBar from './nav';
 
-// Import NavBar component if needed
-
 const Settings = () => {
-  const navigation = useNavigation(); // Hook to use navigation
+  const navigation = useNavigation(); 
 
   const [profileSettings, setProfileSettings] = useState({
     username: 'JohnDoe',
@@ -27,12 +25,10 @@ const Settings = () => {
 
   const handleSaveProfile = () => {
     setEditingProfile(false);
-    // Additional logic to save profile settings if needed
   };
 
   const handleSaveSystem = () => {
     setEditingSystem(false);
-    // Additional logic to save system settings if needed
   };
 
   return (
@@ -169,7 +165,6 @@ const Settings = () => {
         </View>
       </View>
 
-      {/* Render the NavBar component if needed */}
       <NavBar />
     </View>
   );
@@ -188,7 +183,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   content: {
-    marginTop: 60, // Adjust this value as needed to create space below the menu button
+    marginTop: 60, 
   },
   section: {
     marginBottom: 20,
@@ -209,6 +204,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#fff',
+    marginRight: 3,
   },
   settingInput: {
     flex: 3,

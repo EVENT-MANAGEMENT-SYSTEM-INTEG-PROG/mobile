@@ -2,15 +2,15 @@
 
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, TextInput } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; // Import necessary icons
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
-import { Avatar, Provider as PaperProvider } from 'react-native-paper'; // Import PaperProvider and Avatar
-import NavBar from './nav'; // Ensure NavBar is correctly imported
+import { Avatar, Provider as PaperProvider } from 'react-native-paper'; 
+import NavBar from './nav'; 
 import FindEvent from './findevent';
 import Create from './create';
 
 const Dashboard = () => {
-  const navigation = useNavigation(); // Hook to use navigation
+  const navigation = useNavigation(); 
 
   const handleViewAllPress = (section) => {
     console.log(`View All ${section} clicked`);
@@ -315,6 +315,7 @@ const styles = StyleSheet.create({
   },
   eventDetailRow: {
     flexDirection: "column",
+    justifyContent: "space-between",
     marginTop: 10,
   },
   eventDetailContainer: {

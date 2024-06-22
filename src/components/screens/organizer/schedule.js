@@ -94,7 +94,6 @@ const Schedule = () => {
         <Text style={styles.subtitle}>{value.toDateString()}</Text>
         <View style={styles.placeholder}>
           <View style={styles.placeholderInset}>
-            {/* Replace with your content */}
           </View>
           
         </View>

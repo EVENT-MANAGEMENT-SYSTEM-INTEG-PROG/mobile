@@ -2,13 +2,13 @@
 
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; // Import MaterialCommunityIcons for the location icon
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
-import { Avatar, Provider as PaperProvider } from 'react-native-paper'; // Import Avatar and PaperProvider from react-native-paper
+import { Avatar, Provider as PaperProvider } from 'react-native-paper'; 
 import NavBar from './nav';
 
 const Create = () => {
-  const navigation = useNavigation(); // Hook to use navigation
+  const navigation = useNavigation(); 
 
   return (
     <PaperProvider>
@@ -18,7 +18,6 @@ const Create = () => {
           <Ionicons name="menu" size={32} color="white" />
         </TouchableOpacity>
 
-        {/* Profile Section */}
         <View style={styles.profileSection}>
           <Avatar.Image
             size={50}
@@ -41,7 +40,6 @@ const Create = () => {
           </View>
         </View>
 
-        {/* Search Section */}
         <View style={styles.searchContainer}>
           <Text style={styles.label}>Venue Location</Text>
           <TextInput
@@ -51,7 +49,6 @@ const Create = () => {
           />
         </View>
 
-        {/* NavBar Component */}
         <NavBar />
       </View>
     </PaperProvider>
