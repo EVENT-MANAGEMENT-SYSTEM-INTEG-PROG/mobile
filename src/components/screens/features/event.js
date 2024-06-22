@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons'; // Import Ionicons for the burger
 import { useNavigation } from '@react-navigation/native';
 import NavBar from './nav';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const Event = () => {
   const navigation = useNavigation(); // Hook to use navigation
@@ -36,7 +37,7 @@ const Event = () => {
                 <Text style={styles.eventInfoText}>08/15/2024</Text>
               </View>
               <View style={styles.eventInfoBox}>
-                <Icon name="time" size={16} color="#000" />
+                <Icon2 name="clock" size={16} color="#000" />
                 <Text style={styles.eventInfoText}>10:00 AM</Text>
               </View>
               <View style={styles.eventInfoBox}>
@@ -45,7 +46,7 @@ const Event = () => {
               </View>
             </View>
             <TouchableOpacity onPress={() => handleImagePress('Wedding')}>
-              <Image style={styles.mapImage} source={require('./assets/map1.png')} />
+              <Image style={styles.mapImage} source={require('../../../../assets/map1.png')} />
             </TouchableOpacity>
             <View style={styles.eventDetail}>
               <Text style={styles.eventTitle}>Wedding Event</Text>
@@ -72,7 +73,7 @@ const Event = () => {
                 <Text style={styles.eventInfoText}>08/15/2024</Text>
               </View>
               <View style={styles.eventInfoBox}>
-                <Icon name="time" size={16} color="#000" />
+                <Icon2 name="clock" size={16} color="#000" />
                 <Text style={styles.eventInfoText}>10:00 AM</Text>
               </View>
               <View style={styles.eventInfoBox}>
@@ -81,7 +82,7 @@ const Event = () => {
               </View>
             </View>
             <TouchableOpacity onPress={() => handleImagePress('Meeting')}>
-              <Image style={styles.mapImage} source={require('./assets/map1.png')} />
+              <Image style={styles.mapImage} source={require('../../../../assets/map1.png')} />
             </TouchableOpacity>
             <View style={styles.eventDetail}>
               <Text style={styles.eventTitle}>Meeting Event</Text>

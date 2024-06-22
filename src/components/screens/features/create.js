@@ -22,7 +22,7 @@ const Create = () => {
         <View style={styles.profileSection}>
           <Avatar.Image
             size={50}
-            source={require('./assets/pro_pic.png')}
+            source={require('../../../../assets/pro_pic.png')}
             style={styles.profilePicture}
           />
           <View style={styles.welcomeUsername}>

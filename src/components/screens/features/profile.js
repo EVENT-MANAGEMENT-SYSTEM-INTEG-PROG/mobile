@@ -44,7 +44,7 @@ const Profile = () => {
       
       {/* Profile Picture */}
       <Image
-        source={require('./assets/profile-picture.jpg')}
+        source={require('../../../../assets/profile-picture.jpg')}
         style={styles.profilePicture}
       />
       

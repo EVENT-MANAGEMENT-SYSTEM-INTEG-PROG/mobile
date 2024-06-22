@@ -6,8 +6,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook
 import NavBar from './nav';
-import pic from './assets/pic.png';
-import styles from './style';
+import pic from '../../../../assets/pic.png';
+import styles from '../../Styles/style';
 
 const MyEventScreen = () => {
   const navigation = useNavigation(); // Use useNavigation hook to get navigation object

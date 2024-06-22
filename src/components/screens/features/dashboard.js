@@ -37,21 +37,21 @@ const Dashboard = () => {
   const events = [
     {
       id: 1,
-      image: require("./assets/event1.png"),
+      image: require("../../../../assets/event1.png"),
       title: "Mr. & Mrs. Malik Wedding",
       date: "23 Sept, 25",
       location: "Cagayan de Oro City"
     },
     {
       id: 2,
-      image: require("./assets/event2.png"),
+      image: require("../../../../assets/event2.png"),
       title: "Barbella’s Birthday",
       date: "12 August, 23",
       location: "Cagayan de Oro City"
     },
     {
       id: 3,
-      image: require("./assets/event3.png"),
+      image: require("../../../../assets/event3.png"),
       title: "Class of 1979 Reunion",
       date: "25-27 July, 23",
       location: "Cagayan de Oro City"
@@ -65,12 +65,12 @@ const Dashboard = () => {
         <TouchableOpacity onPress={() => navigation.openDrawer()} style={styles.menuButton}>
           <Ionicons name="menu" size={32} color="white" />
         </TouchableOpacity>
-        <Text style={styles.header}>Dashboard Screen</Text>
+        <Text style={styles.header}>Dashboard</Text>
 
         <View style={styles.profileSection}>
           <Avatar.Image
             size={50}
-            source={require("./assets/pro_pic.png")}
+            source={require("../../../../assets/pro_pic.png")}
             style={styles.profilePicture}
           />
           <View style={styles.welcomeUsername}>
@@ -167,7 +167,7 @@ const Dashboard = () => {
           ))}
         </ScrollView>
         <View style={styles.boxContainer}>
-          <Image source={require("./assets/event3.png")} style={styles.boxImage} />
+          <Image source={require("../../../../assets/event3.png")} style={styles.boxImage} />
           <View style={styles.boxTextContainer}>
             <Text style={styles.boxTitle}>Mr. & Mrs. Ambot Lang 2024</Text>
             <View style={styles.boxDetailRow}>
@@ -314,8 +314,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   eventDetailRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: "column",
     marginTop: 10,
   },
   eventDetailContainer: {

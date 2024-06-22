@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import styles from './style'; // Make sure to have styles for this component
+import styles from '../../Styles/style'; // Make sure to have styles for this component
 
 const NavBar = () => {
   const navigation = useNavigation();

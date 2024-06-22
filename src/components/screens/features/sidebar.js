@@ -5,8 +5,8 @@ import React, { useState } from 'react';
 import { View, TouchableOpacity, Text, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import styles from './style';
-import logo from './assets/logo.png';
+import styles from '../../Styles/style';
+import logo from '../../../../assets/logo.png';
 
 const CustomDrawerContent = () => {
 const navigation = useNavigation();

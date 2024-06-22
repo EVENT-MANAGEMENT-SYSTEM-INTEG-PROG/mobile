@@ -16,14 +16,14 @@ import { useNavigation } from '@react-navigation/native';
 import NavBar from './nav';
 
 const eventsData = [
-  { id: '1', title: 'Mr. & Mrs. Malik Wedding', image: require('./assets/event1.png'), date: '2024-07-01', address: 'CDO' },
-  { id: '2', title: 'Elizabeth Birthday', image: require('./assets/event2.png'), date: '2024-08-12', address: 'CDO' },
-  { id: '3', title: 'Class of 1979 Reunion', image: require('./assets/event3.png'), date: '2024-09-25', address: 'CDO' },
-  { id: '4', title: 'Corporate Party', image: require('./assets/event1.png'), date: '2024-10-30', address: 'CDO' },
-  { id: '5', title: 'Annual Gala', image: require('./assets/event2.png'), date: '2024-11-15', address: 'CDO' },
-  { id: '6', title: 'New Year Celebration', image: require('./assets/event3.png'), date: '2024-12-31', address: 'CDO' },
-  { id: '7', title: 'Music Festival', image: require('./assets/event1.png'), date: '2024-06-22', address: 'CDO' },
-  { id: '8', title: 'Art Exhibition', image: require('./assets/event2.png'), date: '2024-07-05', address: 'CDO' },
+  { id: '1', title: 'Mr. & Mrs. Malik Wedding', image: require('../../../../assets/event1.png'), date: '2024-07-01', address: 'CDO' },
+  { id: '2', title: 'Elizabeth Birthday', image: require('../../../../assets/event2.png'), date: '2024-08-12', address: 'CDO' },
+  { id: '3', title: 'Class of 1979 Reunion', image: require('../../../../assets/event3.png'), date: '2024-09-25', address: 'CDO' },
+  { id: '4', title: 'Corporate Party', image: require('../../../../assets/event1.png'), date: '2024-10-30', address: 'CDO' },
+  { id: '5', title: 'Annual Gala', image: require('../../../../assets/event2.png'), date: '2024-11-15', address: 'CDO' },
+  { id: '6', title: 'New Year Celebration', image: require('../../../../assets/event3.png'), date: '2024-12-31', address: 'CDO' },
+  { id: '7', title: 'Music Festival', image: require('../../../../assets/event1.png'), date: '2024-06-22', address: 'CDO' },
+  { id: '8', title: 'Art Exhibition', image: require('../../../../assets/event2.png'), date: '2024-07-05', address: 'CDO' },
 ];
 
 const FindEvent = () => {
