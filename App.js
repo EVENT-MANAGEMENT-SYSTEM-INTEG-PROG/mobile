@@ -1,6 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { StyleSheet } from "react-native";
 import { NavigationContainer } from '@react-navigation/native';
 import Navigator from './src/helper/Navigator';
 import { PaperProvider } from 'react-native-paper';
