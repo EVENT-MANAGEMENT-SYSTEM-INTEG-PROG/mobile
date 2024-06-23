@@ -10,7 +10,7 @@ import {
 import { Searchbar } from "react-native-paper";
 import CarouselView from "../../elements/CarouselView"; // Assuming this is a date selector carousel
 import { useNavigation } from "@react-navigation/native";
-
+import CustomHeader from "../../elements/CustomHeader";
 import Cards from "../../elements/Cards";
 
 export default function BirthdayScreen() {

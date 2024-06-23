@@ -52,7 +52,6 @@ import WeddingScreen from '../components/screens/participants/WeddingScreen';
 import SelectedEventScreen from '../components/screens/participants/SelectedEventScreen';
 import FeedbackScreen from '../components/screens/participants/FeedbackScreen';
 import BookEventScreen from '../components/screens/participants/BookEventScreen';
-// import EventDetails from '../components/screens/participants/EventDetails';
 import FeedbackParticipant from '../components/screens/participants/FeedbackParticipant';
 import CopyLinkScreen from '../components/screens/participants/CopyLinkScreen';
 
@@ -145,7 +144,7 @@ function EventsTab() {
         <Stack.Screen name="CopyLink" component={CopyLinkScreen} />
   
         {/* Feedback screen */}
-        <Stack.Screen name="FeedbackParticipant" component={FeedbackParticipant} />
+        <Stack.Screen name="Feedback" component={FeedbackParticipant} />
       </Stack.Navigator>
     );
   }
