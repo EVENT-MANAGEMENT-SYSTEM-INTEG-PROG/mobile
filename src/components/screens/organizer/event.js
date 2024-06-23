@@ -44,7 +44,7 @@ const Event = () => {
               </View>
             </View>
             <TouchableOpacity onPress={() => handleImagePress('Wedding')}>
-              <Image style={styles.mapImage} source={require('../../../../assets/map1.png')} />
+              <Image style={styles.mapImage} source={require('../../../../assets/organizer_images/map1.png')} />
             </TouchableOpacity>
             <View style={styles.eventDetail}>
               <Text style={styles.eventTitle}>Wedding Event</Text>
@@ -80,7 +80,7 @@ const Event = () => {
               </View>
             </View>
             <TouchableOpacity onPress={() => handleImagePress('Meeting')}>
-              <Image style={styles.mapImage} source={require('../../../../assets/map1.png')} />
+              <Image style={styles.mapImage} source={require('../../../../assets/organizer_images/map1.png')} />
             </TouchableOpacity>
             <View style={styles.eventDetail}>
               <Text style={styles.eventTitle}>Meeting Event</Text>
@@ -115,6 +115,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+    marginBottom: 60,
   },
   bookedEvents: {
     padding: 20,

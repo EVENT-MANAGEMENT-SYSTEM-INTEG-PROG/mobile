@@ -90,7 +90,7 @@ const Schedule = () => {
         </Swiper>
       </View>
 
-      <View style={{ flex: 1, paddingHorizontal: 16, paddingVertical: 24 }}>
+      <View style={{ flex: 1, paddingHorizontal: 16, paddingVertical: 24, marginBottom: 25 }}>
         <Text style={styles.subtitle}>{value.toDateString()}</Text>
         <View style={styles.placeholder}>
           <View style={styles.placeholderInset}>

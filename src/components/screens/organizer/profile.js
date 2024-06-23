@@ -43,7 +43,7 @@ const Profile = () => {
       </TouchableOpacity>
       
       <Image
-        source={require('../../../../assets/profile-picture.jpg')}
+        source={require('../../../../assets/organizer_images/profile-picture.jpg')}
         style={styles.profilePicture}
       />
       

@@ -47,7 +47,7 @@ const Budget = () => {
         <View style={styles.budgetSection}>
           <Image
             style={styles.orgimage}
-            source={require("../../../../assets/pic.png")}
+            source={require("../../../../assets/organizer_images/pic.png")}
           />
           <Text style={styles.eventTitle}>Mr. & Mrs. Malik Wedding</Text>
           <View style={styles.budgetInfo}>

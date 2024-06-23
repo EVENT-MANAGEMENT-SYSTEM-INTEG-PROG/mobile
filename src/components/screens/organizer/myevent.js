@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook
 import NavBar from './nav';
-import pic from '../../../../assets/pic.png';
+import pic from '../../../../assets/organizer_images/pic.png';
 import styles from '../../Styles/style';
 
 const MyEventScreen = () => {
@@ -20,7 +20,7 @@ const MyEventScreen = () => {
   return (
     <LinearGradient
       colors={['#2A2600', '#000000']}
-      style={{ flex: 1 }}
+      style={{ flex: 1, paddingBottom: 30 }}
     >
       <TouchableOpacity onPress={() => navigation.openDrawer()} style={styles.menuButton}>
         <Ionicons name="menu" size={32} color="white" />

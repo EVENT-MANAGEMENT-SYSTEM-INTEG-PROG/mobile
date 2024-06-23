@@ -15,7 +15,7 @@ const services = [
     rate: '$$$',
     phoneNumber: '123-456-7890',
     role: 'Food Service Provider',
-    image: require('../../../../assets/catering.jpg')
+    image: require('../../../../assets/organizer_images/catering.jpg')
   },
   {
     id: '2',
@@ -26,7 +26,7 @@ const services = [
     rate: '$$',
     phoneNumber: '987-654-3210',
     role: 'Photographer',
-    image: require('../../../../assets/photography.jpg')
+    image: require('../../../../assets/organizer_images/photography.jpg')
   },
   {
     id: '3',
@@ -37,7 +37,7 @@ const services = [
     rate: '$$$',
     phoneNumber: '456-789-0123',
     role: 'Venue Provider',
-    image: require('../../../../assets/venue.jpg')
+    image: require('../../../../assets/organizer_images/venue.jpg')
   },
   {
     id: '4',
@@ -48,7 +48,7 @@ const services = [
     rate: '$$$',
     phoneNumber: '789-012-3456',
     role: 'DJ',
-    image: require('../../../../assets/dj.jpg')
+    image: require('../../../../assets/organizer_images/dj.jpg')
   }
 ];
 
@@ -144,6 +144,7 @@ const styles = StyleSheet.create({
   },
   flatList: {
     paddingHorizontal: 5,
+    marginBottom: 60,
   },
   serviceItem: {
     backgroundColor: '#fff',

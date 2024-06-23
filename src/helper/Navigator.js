@@ -1,16 +1,23 @@
 import React from 'react';  // Add this import
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { View } from "react-native";
+//Stacks
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
 
 //Authentication
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import RegisterScreen from "../components/screens/authentication/RegisterScreen";
 import AccountRecoveryScreen from "../components/screens/authentication/AccountRecoveryScreen";
 import LandingScreen from "../components/screens/authentication/LandingScreen";
 import LoginScreen from "../components/screens/authentication/LoginScreen";
 
+
 //Admin
 
+
 //Oganizer
-import { createDrawerNavigator } from '@react-navigation/drawer';
 import CustomDrawerContent from '../components/screens/organizer/sidebar';
 import MyEventScreen from '../components/screens/organizer/myevent';
 import EditScreen from '../components/screens/organizer/edit';
@@ -31,10 +38,46 @@ import FindEvent from '../components/screens/organizer/findevent';
 import Create from '../components/screens/organizer/create';
 import ViewSched from '../components/screens/organizer/viewsched';
 
+
+//EventsTab
+import EventsScreen from '../components/screens/participants/EventsScreen';
+import CalendarScreen from '../components/screens/participants/CalendarScreen';
+import JoinedEventsScreen from '../components/screens/participants/JoinedEventsScreen';
+import BirthdayScreen from '../components/screens/participants/BirthdayScreen';
+import SummitScreen from '../components/screens/participants/SummitScreen';
+import ReunionScreen from '../components/screens/participants/ReunionScreen';
+import ConcertScreen from '../components/screens/participants/ConcertScreen';
+import FestivalScreen from '../components/screens/participants/FestivalScreen';
+import WeddingScreen from '../components/screens/participants/WeddingScreen';
+import SelectedEventScreen from '../components/screens/participants/SelectedEventScreen';
+import FeedbackScreen from '../components/screens/participants/FeedbackScreen';
+import BookEventScreen from '../components/screens/participants/BookEventScreen';
+// import EventDetails from '../components/screens/participants/EventDetails';
+import FeedbackParticipant from '../components/screens/participants/FeedbackParticipant';
+import CopyLinkScreen from '../components/screens/participants/CopyLinkScreen';
+
+
+//Participants
+import HomeScreen from '../components/screens/participants/HomeScreen';
+import AboutScreen from '../components/screens/participants/AboutScreen';
+import ServicesScreen from '../components/screens/participants/ServicesScreen';
+import ProfileScreen from '../components/screens/participants/ProfileScreen';
+import NotificationsScreen from '../components/screens/participants/NotificationsScreen';
+import BudgetParticipant from '../components/screens/participants/BudgetParticipant';
+import EventPortfolioScreen from '../components/screens/participants/EventPortfolioScreen';
+import EventDetails from '../components/screens/participants/EventDetails';
+import SelectedContactViewScreen from '../components/screens/participants/SelectedContactViewScreen';
+import ConversationViewScreen from '../components/screens/participants/ConversationViewScreen';
+
+
+
+
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
+const Tab = createBottomTabNavigator();
 
 
+//Authentication
 function AuthenticationStack() {
     return ( 
         <Stack.Navigator>
@@ -46,7 +89,7 @@ function AuthenticationStack() {
     )
 }
 
-
+//Organizer Priviledges
 function OrganizerStack() {
     return (
         <Drawer.Navigator drawerContent={props => <CustomDrawerContent {...props} />}>
@@ -72,6 +115,136 @@ function OrganizerStack() {
       </Drawer.Navigator>
     );
 }
+
+
+//Events - Participants
+function EventsTab() {
+    return (
+      <Stack.Navigator
+        initialRouteName="EventsStack"
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name="EventsStack" component={EventsScreen} />
+        <Stack.Screen name="Calendar" component={CalendarScreen} />
+        <Stack.Screen name="JoinedEvents" component={JoinedEventsScreen} />
+  
+        {/* 6 event types */}
+        <Stack.Screen name="Birthday" component={BirthdayScreen} />
+        <Stack.Screen name="Summit" component={SummitScreen} />
+        <Stack.Screen name="Reunion" component={ReunionScreen} />
+        <Stack.Screen name="Concert" component={ConcertScreen} />
+        <Stack.Screen name="Festival" component={FestivalScreen} />
+        <Stack.Screen name="Wedding" component={WeddingScreen} />
+  
+        {/* selected event screen */}
+        <Stack.Screen name="SelectedEvent" component={SelectedEventScreen} />
+        <Stack.Screen name="BookEvent" component={BookEventScreen} />
+        <Stack.Screen name="EventDetails" component={EventDetails} />
+        <Stack.Screen name="CopyLink" component={CopyLinkScreen} />
+  
+        {/* Feedback screen */}
+        <Stack.Screen name="FeedbackParticipant" component={FeedbackParticipant} />
+      </Stack.Navigator>
+    );
+  }
+
+
+//Participants Priviledges
+function ParticipantsStack() {
+    return (
+        <Stack.Navigator
+            screenOptions={{
+                headerStyle: {
+                backgroundColor: "black", // Replace 'yourColor' with your desired color
+                },
+                headerTintColor: "#fff", // This changes the color of the back button and title
+                headerTitleStyle: {
+                fontWeight: "bold",
+                },
+            }}
+        >
+            <Stack.Screen name="MainTabs" options={{ headerShown: false }}>
+                {() => (
+                <Tab.Navigator
+                screenOptions={({ route }) => ({
+                    tabBarIcon: ({ focused, color, size }) => {
+                    let iconName;
+
+                    if (route.name === "Home") {
+                        iconName = "home";
+                    } else if (route.name === "Event") {
+                        iconName = "calendar";
+                    } else if (route.name === "About") {
+                        iconName = "information";
+                    } else if (route.name === "Services") {
+                        iconName = "briefcase";
+                    }
+
+                    return (
+                        <View style={{ width: "100%", alignItems: "center" }}>
+                        {focused && (
+                            <View
+                            style={{
+                                marginTop: 5,
+                                height: 3,
+                                width: "50%",
+                                backgroundColor: "black",
+                                borderRadius: 30,
+                            }}
+                            />
+                        )}
+                        <MaterialCommunityIcons
+                            name={iconName}
+                            size={size}
+                            color={color}
+                            style={{ paddingTop: 5 }}
+                        />
+                        </View>
+                    );
+                    },
+                    tabBarActiveTintColor: "black",
+                    tabBarInactiveTintColor: "black",
+                    tabBarStyle: {
+                    backgroundColor: "#FFC42B",
+                    borderTopLeftRadius: 20,
+                    borderTopRightRadius: 20,
+                    position: "absolute",
+                    bottom: 0,
+                    padding: 10,
+                    height: 60,
+                    zIndex: 8,
+                    },
+                    headerShown: false,
+                    tabBarLabel: "",
+                })}
+                >
+                <Tab.Screen name="Home" component={HomeScreen} />
+                <Tab.Screen name="Event" component={EventsTab} />
+                <Tab.Screen name="About" component={AboutScreen} />
+                <Tab.Screen name="Services" component={ServicesScreen} />
+                </Tab.Navigator>
+            )}
+            </Stack.Screen>
+
+            <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="Notification" component={NotificationsScreen} />
+            <Stack.Screen name="Event Details" component={EventDetails} />
+            <Stack.Screen name="Budget" component={BudgetParticipant} />
+            <Stack.Screen name="Event Portfolio" component={EventPortfolioScreen}/>
+            <Stack.Screen 
+                name="SelectContactView"
+                component={SelectedContactViewScreen}
+            />
+            <Stack.Screen 
+                name="ConversationView"
+                component={ConversationViewScreen}
+            />
+        </Stack.Navigator>
+    )
+}
+
 
 
 export default function Navigator() {

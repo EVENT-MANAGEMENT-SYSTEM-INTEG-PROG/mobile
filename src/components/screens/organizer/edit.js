@@ -44,7 +44,7 @@ const EditScreen = ({ navigation }) => {
             <Text style={styles.eventDescription}>123 Main Street, New York, NY 10001</Text>
           </View>
           <View style={styles.imageContainer}>
-            <Image source={require('../../../../assets/pic.png')} style={styles.image} />
+            <Image source={require('../../../../assets/organizer_images/pic.png')} style={styles.image} />
           </View>
           <Text style={[styles.invitedTitle, { color: '#FFC42B' }]}>People Invited</Text>
           <View style={[styles.rectangle, styles.eventInfo]}>
@@ -80,7 +80,7 @@ const EditScreen = ({ navigation }) => {
               </TouchableOpacity>
               <Text style={styles.invitationText}>You’re Invited!</Text>
               <View style={styles.invitationImageContainer}>
-                <Image source={require('../../../../assets/qr.png')} style={styles.invitationImage} />
+                <Image source={require('../../../../assets/organizer_images/qr.png')} style={styles.invitationImage} />
               </View>
           <Text style={[styles.eventNameText, { color: '#FFC42B' }]}>Event Name</Text>
           <View style={[styles.rectangle, styles.eventInfo]}>

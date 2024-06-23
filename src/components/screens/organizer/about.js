@@ -83,6 +83,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingTop: 80, // Add padding to avoid overlap with menu button
+    marginBottom: 60,
   },
   header: {
     alignItems: 'center',
@@ -95,7 +96,7 @@ const styles = StyleSheet.create({
   },
   body: {
     padding: 20,
-    marginBottom: 50,
+    marginBottom: 70,
     flex: 1, // This allows the scrollview to take up remaining space
   },
   visionbg: {
