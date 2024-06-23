@@ -22,12 +22,14 @@ import {
 } from "react-native-responsive-screen";
 import { useState } from "react";
 import Toast from "react-native-root-toast";
+import fetchServices from "../../../services/authentication/fetchServices";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = () => {
   const navigator = useNavigation();
 
   const [HideEntry, setHideEntry] = useState(true);
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -42,35 +44,32 @@ const LoginScreen = () => {
 
   const handleLogin = async () => {
     try {
-      setLoading(!loading);
-
-      if (username === "" || password === "") {
+      setLoading(true);
+  
+      if (email === "" || password === "") {
         showToast("Please input required data");
         setIsError(true);
-        return false;
+        return;
       }
-
+  
       const data = {
-        username,
+        email,
         password,
       };
-
+  
+      const url = "http://192.168.29.137:8000/api/user/login"; // Replace with actual login endpoint
+  
       const result = await fetchServices.postData(url, data);
-
-      if (result.message != null) {
-        showToast(result?.message);
+  
+      if (result.token) {
+        // Store token in AsyncStorage
+        await AsyncStorage.setItem('token', result.token);
       } else {
-        navigator.navigate("HomeScreen");
+        showToast("Login failed");
       }
-
-      if (result.message === "User Logged in Successfully") {
-        navigator.navigate("HomeScreen");
-      } else {
-        return false;
-      }
-    } catch (e) {
-      console.debug(e.toString());
-      showToast("An error occurred");
+    } catch (error) {
+      console.error("Login error:", error);
+      showToast("An error occurred during login.");
     } finally {
       setLoading(false);
     }
@@ -88,10 +87,10 @@ const LoginScreen = () => {
       >
         <SafeAreaView style={styles.container}>
           <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : null}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={styles.formContainer}
             keyboardVerticalOffset={
-              Platform.OS === "ios" ? 0 : heightPercentageToDP("15%")
+              Platform.OS === "ios" ? 0 : -heightPercentageToDP("5%")
             }
           >
             <Image
@@ -124,13 +123,13 @@ const LoginScreen = () => {
               <TextInput
                 style={styles.inputStyle}
                 mode="outlined"
-                label="Username"
-                placeholder="Enter your username"
-                inputMode="username"
-                value={username}
+                label="Email"
+                placeholder="Enter your email"
+                inputMode="email"
+                value={email}
                 error={isError}
                 onChangeText={(text) => {
-                  setUsername(text);
+                  setEmail(text);
                 }}
                 theme={{
                   colors: {
@@ -222,13 +221,11 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: "flex-end",
     alignItems: "center",
     paddingBottom: heightPercentageToDP("15%"),
   },
   formContainer: {
     flex: 1,
-    justifyContent: "flex-end",
     alignItems: "center",
     paddingBottom: heightPercentageToDP("1%"),
   },
@@ -247,7 +244,7 @@ const styles = StyleSheet.create({
   },
   buttonStyle: {
     width: widthPercentageToDP("80%"),
-    height: heightPercentageToDP("6%"),
+    height: heightPercentageToDP("5%"),
     marginBottom: heightPercentageToDP("5%"),
     marginTop: heightPercentageToDP("-10%"),
   },

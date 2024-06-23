@@ -1,14 +1,15 @@
 import React, { useState } from "react";
-import { SafeAreaView, ImageBackground, StyleSheet, Platform, KeyboardAvoidingView, ScrollView, View, TouchableOpacity } from "react-native";
+import { SafeAreaView, ImageBackground, StyleSheet, Platform, KeyboardAvoidingView, ScrollView, View, Keyboard } from "react-native";
 import { Text, Button, TextInput, Menu, Divider, Provider as PaperProvider } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-root-toast";
 import { widthPercentageToDP, heightPercentageToDP } from "react-native-responsive-screen";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import fetchServices from "../../../services/authentication/fetchServices";
 
 const RegisterScreen = () => {
   const navigator = useNavigation();
-  const [username, setUsername] = useState("");
+  const [user_name, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repassword, setRepassword] = useState("");
@@ -16,7 +17,7 @@ const RegisterScreen = () => {
   const [loading, setLoading] = useState(false);
   const [HideEntry, setHideEntry] = useState(true);
   const [role, setRole] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [mobile_number, setMobileNumber] = useState("");
   const [visible, setVisible] = useState(false);
   const [selectedRole, setSelectedRole] = useState(null);
 
@@ -25,7 +26,14 @@ const RegisterScreen = () => {
 
   const handleRoleChange = (value) => {
     setSelectedRole(value);
-    setRole(value);
+    
+    // Map role names to role IDs
+    if (value === 'EVENT ORGANIZER') {
+      setRole(2); // Set role_id 2 for EVENT ORGANIZER
+    } else if (value === 'PARTICIPANT') {
+      setRole(3); // Set role_id 3 for PARTICIPANT
+    }
+    
     closeMenu();
   };
 
@@ -44,40 +52,61 @@ const RegisterScreen = () => {
   const handleRegistration = async () => {
     try {
       setLoading(true);
-
-      if (username === "" || email === "" || password === "" || phoneNumber === "" || role === "") {
+  
+      if (user_name === "" || email === "" || password === "" || mobile_number === "" || role === "") {
         showToast("Please input required data");
         setIsError(true);
         return;
       }
-
+  
       if (password !== repassword) {
         showToast("Passwords do not match");
         setIsError(true);
         return;
       }
-
+  
       const data = {
-        username,
+        user_name,
         email,
         password,
-        role,
-        phoneNumber,
+        password_confirmation: repassword,
+        role_id: role, // Ensure role_id is passed as an integer here
+        mobile_number,
       };
-
+  
+      const url = "http://192.168.29.137:8000/api/user/signup";  // Replace with the actual URL
+  
       const result = await fetchServices.postData(url, data);
-
+  
       if (result.message != null) {
         showToast(result?.message);
-      } else {
-        navigator.navigate("HomeScreen");
+        Keyboard.dismiss();
+        
+        // Introduce a delay of 2 seconds (adjust the time as needed)
+        setTimeout(() => {
+          navigator.navigate("LoginScreen");
+        }, 1000);
+  
+        // Reset the form
+        resetForm();
       }
-    } catch (e) {
-      console.error(e.toString());
-      showToast("An error occurred");
+    } catch (error) {
+      console.error("Registration error:", error);
+      showToast("An error occurred during registration.");
     } finally {
       setLoading(false);
     }
+  };  
+
+  const resetForm = () => {
+    setUsername("");
+    setEmail("");
+    setPassword("");
+    setRepassword("");
+    setMobileNumber("");
+    setRole("");
+    setSelectedRole(null);
+    setIsError(false);
   };
 
   return (
@@ -121,7 +150,7 @@ const RegisterScreen = () => {
                   label="Username"
                   placeholder="Enter your username"
                   error={isError}
-                  value={username}
+                  value={user_name}
                   onChangeText={(text) => setUsername(text)}
                   theme={{
                     colors: {
@@ -157,9 +186,9 @@ const RegisterScreen = () => {
                   mode="outlined"
                   label="Phone number"
                   placeholder="Enter your phone number"
-                  value={phoneNumber}
+                  value={mobile_number}
                   error={isError}
-                  onChangeText={(text) => setPhoneNumber(text)}
+                  onChangeText={(text) => setMobileNumber(text)}
                   theme={{
                     colors: {
                       primary: "#FFC42B",
@@ -226,7 +255,7 @@ const RegisterScreen = () => {
                   style={styles.buttonStyle}
                   mode="contained"
                   onPress={handleRegistration}
-                  labelStyle={{ color: "black", fontWeight: "bold" }}
+                  labelStyle={{ color: "black", fontWeight: "bold"  }}
                 >
                   Create Account
                 </Button>
@@ -287,7 +316,7 @@ const styles = StyleSheet.create({
   },
   buttonStyle: {
     width: widthPercentageToDP("80%"),
-    height: heightPercentageToDP("6%"),
+    height: heightPercentageToDP("5%"),
     marginBottom: heightPercentageToDP("2%"),
     backgroundColor: "#FFC42B",
   },

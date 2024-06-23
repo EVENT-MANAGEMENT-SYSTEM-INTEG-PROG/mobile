@@ -247,6 +247,6 @@ function ParticipantsStack() {
 
 
 export default function Navigator() {
-    return <ParticipantsStack />;
+    return <AuthenticationStack />;
 }
 
