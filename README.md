@@ -2,10 +2,10 @@
 
 ## Instructions
 
-To get started with the mobile app, follow these steps:
+To get started with the mobile app, follow these steps: (use Command Prompt or CMD)
 
 ```sh
-# Clone the repository, switch to the `mobile` branch, and open the project in your code editor
+# Clone the repository
 git clone https://github.com/EVENT-MANAGEMENT-SYSTEM-INTEG-PROG/test.git
 
 # Go the the Directory
@@ -14,7 +14,7 @@ cd test
 # Switch the branch
 git checkout mobile
 
-#Open the IDE
+# Open the IDE
 code .
 
 # Install dependencies
