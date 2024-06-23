@@ -248,6 +248,6 @@ function ParticipantsStack() {
 
 
 export default function Navigator() {
-    return <OrganizerStack />;
+    return <ParticipantsStack />;
 }
 

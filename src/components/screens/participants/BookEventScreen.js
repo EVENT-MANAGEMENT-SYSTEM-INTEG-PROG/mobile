@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
   },
   goBackButton: {
     marginLeft: 20,
-    marginTop: 40,
+    marginTop: 50,
     marginBottom: 5,
   },
   header: {

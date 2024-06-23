@@ -45,6 +45,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: "absolute",
+    marginTop: 35,
     left: 15,
     top: "50%",
     transform: [{ translateY: -12 }],
