@@ -1,41 +1,27 @@
 import React, { useState } from "react";
 import { SafeAreaView, ImageBackground, StyleSheet, Platform, KeyboardAvoidingView, ScrollView, View, Keyboard } from "react-native";
-import { Text, Button, TextInput, Menu, Divider, Provider as PaperProvider } from "react-native-paper";
+import { Text, Button, TextInput, Provider as PaperProvider } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-root-toast";
 import { widthPercentageToDP, heightPercentageToDP } from "react-native-responsive-screen";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import fetchServices from "../../../services/authentication/fetchServices";
+import { signup } from "../../../services/authentication/authServices";
 
 const RegisterScreen = () => {
   const navigator = useNavigation();
   const [user_name, setUsername] = useState("");
+  const [first_name, setFirstName] = useState("");
+  const [last_name, setLastName] = useState("");
+  const [gender, setGender] = useState("");
+  const [date_of_birth, setDateOfBirth] = useState("");
+  const [country, setCountry] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repassword, setRepassword] = useState("");
   const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [HideEntry, setHideEntry] = useState(true);
-  const [role, setRole] = useState("");
   const [mobile_number, setMobileNumber] = useState("");
-  const [visible, setVisible] = useState(false);
-  const [selectedRole, setSelectedRole] = useState(null);
-
-  const openMenu = () => setVisible(true);
-  const closeMenu = () => setVisible(false);
-
-  const handleRoleChange = (value) => {
-    setSelectedRole(value);
-    
-    // Map role names to role IDs
-    if (value === 'EVENT ORGANIZER') {
-      setRole(2); // Set role_id 2 for EVENT ORGANIZER
-    } else if (value === 'PARTICIPANT') {
-      setRole(3); // Set role_id 3 for PARTICIPANT
-    }
-    
-    closeMenu();
-  };
 
   const toggleSecureEntry = () => {
     setHideEntry(!HideEntry);
@@ -52,60 +38,75 @@ const RegisterScreen = () => {
   const handleRegistration = async () => {
     try {
       setLoading(true);
-  
-      if (user_name === "" || email === "" || password === "" || mobile_number === "" || role === "") {
+
+      if (
+        user_name === "" ||
+        first_name === "" ||
+        last_name === "" ||
+        gender === "" ||
+        date_of_birth === "" ||
+        country === "" ||
+        email === "" ||
+        password === "" ||
+        mobile_number === ""
+      ) {
         showToast("Please input required data");
         setIsError(true);
         return;
       }
-  
+
       if (password !== repassword) {
         showToast("Passwords do not match");
         setIsError(true);
         return;
       }
-  
-      const data = {
+
+      const userData = {
         user_name,
+        first_name,
+        last_name,
+        gender,
+        date_of_birth,
+        country,
         email,
         password,
         password_confirmation: repassword,
-        role_id: role, // Ensure role_id is passed as an integer here
+        role_id: 2, // Fixed role_id for PARTICIPANT
         mobile_number,
       };
-  
-      const url = "http://192.168.29.137:8000/api/user/signup";  // Replace with the actual URL
-  
-      const result = await fetchServices.postData(url, data);
-  
-      if (result.message != null) {
-        showToast(result?.message);
-        Keyboard.dismiss();
-        
-        // Introduce a delay of 2 seconds (adjust the time as needed)
-        setTimeout(() => {
-          navigator.navigate("LoginScreen");
-        }, 1000);
-  
-        // Reset the form
-        resetForm();
-      }
+
+      await signup(userData);
+
+      showToast("Registration successful");
+
+      Keyboard.dismiss();
+
+      // Introduce a delay of 2 seconds (adjust the time as needed)
+      setTimeout(() => {
+        navigator.navigate("LoginScreen");
+      }, 1000);
+
+      // Reset the form
+      resetForm();
     } catch (error) {
       console.error("Registration error:", error);
       showToast("An error occurred during registration.");
     } finally {
       setLoading(false);
     }
-  };  
+  };
 
   const resetForm = () => {
     setUsername("");
+    setFirstName("");
+    setLastName("");
+    setGender("");
+    setDateOfBirth("");
+    setCountry("");
     setEmail("");
     setPassword("");
     setRepassword("");
     setMobileNumber("");
-    setRole("");
-    setSelectedRole(null);
     setIsError(false);
   };
 
@@ -120,29 +121,6 @@ const RegisterScreen = () => {
           <ScrollView contentContainerStyle={styles.formContainer}>
             <Text style={styles.headerText}>REGISTER</Text>
             <PaperProvider>
-              <View style={[styles.inputContainer, { backgroundColor: '#fff', borderRadius: 5, margin: 30, width: widthPercentageToDP("80%"), alignItems: "center", position: 'relative', zIndex: 1 }]}>
-                <Menu
-                  visible={visible}
-                  onDismiss={closeMenu}
-                  contentStyle={{ backgroundColor: '#fff', zIndex: 999 }}
-                  anchor={
-                    <View style={{ flexDirection: "row", alignItems: "center" }}>
-                      <View style={[styles.menuStyle, { backgroundColor: '#FFC42B', padding: 1, borderRadius: 30, marginBottom: 5, marginTop: 5, margin: 18, zIndex: 999 }]}>
-                        <Text style={{ color: "black", fontWeight: "bold", textAlign: "center", margin: 14 }}>
-                          {selectedRole ?? 'Please Select Role: '}
-                        </Text>
-                      </View>
-                      <Icon name="arrow-down-drop-circle-outline" size={30} color="black" style={{ marginLeft: 10 }} onPress={openMenu} />
-                    </View>
-                  }
-                  style={{ position: 'absolute', zIndex: 999, top: 85, left: 95 }}
-                >
-                  <Menu.Item onPress={() => handleRoleChange('EVENT ORGANIZER')} title="EVENT ORGANIZER" />
-                  <Divider />
-                  <Menu.Item onPress={() => handleRoleChange('PARTICIPANT')} title="PARTICIPANT" />
-                </Menu>
-              </View>
-
               <View style={{ alignItems: "center" }}>
                 <TextInput
                   style={styles.inputStyle}
@@ -161,6 +139,96 @@ const RegisterScreen = () => {
                     },
                   }}
                   left={<TextInput.Icon icon={() => <CustomIcon name="account" size={24} color="black" />} />}
+                />
+                <TextInput
+                  style={styles.inputStyle}
+                  mode="outlined"
+                  label="First Name"
+                  placeholder="Enter your first name"
+                  error={isError}
+                  value={first_name}
+                  onChangeText={(text) => setFirstName(text)}
+                  theme={{
+                    colors: {
+                      primary: "#FFC42B",
+                      text: "#000",
+                      placeholder: "#FFC42B",
+                      background: "#fff",
+                    },
+                  }}
+                  left={<TextInput.Icon icon={() => <CustomIcon name="account" size={24} color="black" />} />}
+                />
+                <TextInput
+                  style={styles.inputStyle}
+                  mode="outlined"
+                  label="Last Name"
+                  placeholder="Enter your last name"
+                  error={isError}
+                  value={last_name}
+                  onChangeText={(text) => setLastName(text)}
+                  theme={{
+                    colors: {
+                      primary: "#FFC42B",
+                      text: "#000",
+                      placeholder: "#FFC42B",
+                      background: "#fff",
+                    },
+                  }}
+                  left={<TextInput.Icon icon={() => <CustomIcon name="account" size={24} color="black" />} />}
+                />
+                <TextInput
+                  style={styles.inputStyle}
+                  mode="outlined"
+                  label="Gender"
+                  placeholder="Enter your gender"
+                  error={isError}
+                  value={gender}
+                  onChangeText={(text) => setGender(text)}
+                  theme={{
+                    colors: {
+                      primary: "#FFC42B",
+                      text: "#000",
+                      placeholder: "#FFC42B",
+                      background: "#fff",
+                    },
+                  }}
+                  left={<TextInput.Icon icon={() => <CustomIcon name="gender-male-female" size={24} color="black" />} />}
+                />
+                <TextInput
+                  style={styles.inputStyle}
+                  mode="outlined"
+                  label="Date of Birth"
+                  placeholder="Enter your date of birth"
+                  error={isError}
+                  value={date_of_birth}
+                  onChangeText={(text) => setDateOfBirth(text)}
+                  theme={{
+                    colors: {
+                      primary: "#FFC42B",
+                      text: "#000",
+                      placeholder: "#FFC42B",
+                      background: "#fff",
+                    },
+                  }}
+                  left={<TextInput.Icon icon={() => <CustomIcon name="calendar" size={24} color="black" />} />}
+                />
+                <TextInput
+                  style={styles.inputStyle}
+                  mode="outlined"
+                  label="Country"
+                  placeholder="Enter your country"
+                  error={isError}
+                  value={country}
+                  onChangeText={(text) => setCountry(text)}
+                  theme={{
+                    colors: {
+                      primary: "#FFC42B",
+                      text: "#000",
+                      placeholder: "#FFC42B",
+                      background: "#fff",
+                    },
+                  }}
+                  left={<TextInput.Icon icon={() => <CustomIcon name="earth" size={24} color="black" />} />}
                 />
                 <TextInput
                   style={styles.inputStyle}
@@ -305,10 +373,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: widthPercentageToDP("10%"),
   },
-  inputContainer: {
-    width: widthPercentageToDP("80%"),
-    marginBottom: heightPercentageToDP("2%"),
-  },
   inputStyle: {
     width: widthPercentageToDP("80%"),
     marginBottom: heightPercentageToDP("2%"),
@@ -319,9 +383,6 @@ const styles = StyleSheet.create({
     height: heightPercentageToDP("5%"),
     marginBottom: heightPercentageToDP("2%"),
     backgroundColor: "#FFC42B",
-  },
-  menuStyle: {
-    width: widthPercentageToDP("50%"),
   },
 });
 

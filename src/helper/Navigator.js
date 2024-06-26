@@ -1,20 +1,17 @@
-import React from 'react';  // Add this import
+import React, { useContext } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { View } from "react-native";
+import { LogBox, View, ActivityIndicator } from "react-native";
 //Stacks
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-
 
 //Authentication
 import RegisterScreen from "../components/screens/authentication/RegisterScreen";
 import AccountRecoveryScreen from "../components/screens/authentication/AccountRecoveryScreen";
 import LandingScreen from "../components/screens/authentication/LandingScreen";
 import LoginScreen from "../components/screens/authentication/LoginScreen";
-
-
-//Admin
 
 
 //Oganizer
@@ -68,7 +65,7 @@ import EventDetails from '../components/screens/participants/EventDetails';
 import SelectedContactViewScreen from '../components/screens/participants/SelectedContactViewScreen';
 import ConversationViewScreen from '../components/screens/participants/ConversationViewScreen';
 
-
+import { AuthContext } from '../services/authentication/authContext';
 
 
 const Stack = createNativeStackNavigator();
@@ -76,17 +73,29 @@ const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
 
 
-//Authentication
-function AuthenticationStack() {
-    return ( 
-        <Stack.Navigator>
-            <Stack.Screen name="LandingScreen" component={LandingScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="RegisterScreen" component={RegisterScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="AccountRecoveryScreen" component={AccountRecoveryScreen} options={{ headerShown: false }} />
+const AuthenticationStack = () => {
+    LogBox.ignoreAllLogs();
+    const { user, loading } = useContext(AuthContext);
+
+    if (loading) {
+        return <ActivityIndicator />; // A screen or component to show while loading
+    }
+
+    return (
+        <Stack.Navigator
+            initialRouteName={user ? (user.role_id === 2 ? "ParticipantsStack" : "OrganizerStack") : "LandingScreen"}
+            screenOptions={{ headerShown: false }}
+        >
+            <Stack.Screen name="LandingScreen" component={LandingScreen} />
+            <Stack.Screen name="LoginScreen" component={LoginScreen} />
+            <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
+            <Stack.Screen name="AccountRecoveryScreen" component={AccountRecoveryScreen} />
+            <Stack.Screen name="ParticipantsStack" component={ParticipantsStack} />
+            <Stack.Screen name="OrganizerStack" component={OrganizerStack} />
         </Stack.Navigator>
-    )
-}
+    );
+};
+
 
 //Organizer Priviledges
 function OrganizerStack() {
@@ -244,9 +253,7 @@ function ParticipantsStack() {
     )
 }
 
-
-
 export default function Navigator() {
-    return <AuthenticationStack />;
+    return <AuthenticationStack />
 }
 

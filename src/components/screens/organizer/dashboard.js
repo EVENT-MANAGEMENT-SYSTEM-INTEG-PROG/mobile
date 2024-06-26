@@ -1,16 +1,42 @@
 // dashboard.js
 
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, BackHandler } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; 
-import { useNavigation } from '@react-navigation/native';
 import { Avatar, Provider as PaperProvider } from 'react-native-paper'; 
 import NavBar from './nav'; 
 import FindEvent from './findevent';
 import Create from './create';
+import { getUser } from '../../../services/authentication/authServices';
 
-const Dashboard = () => {
-  const navigation = useNavigation(); 
+const Dashboard = ( {navigation} ) => {
+  const [user_name, setUsername] = useState("");
+  const [country, setCountry] = useState("");
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userData = await getUser();
+        setUsername(userData.user_name); // Assuming the user object contains a username property
+        setCountry(userData.country); // Assuming the user object contains a location property
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      // Do nothing when the back button is pressed
+      return true;
+    });
+
+    // Cleanup the event listener when the component unmounts
+    return () => backHandler.remove();
+  }, []);
+
 
   const handleViewAllPress = (section) => {
     console.log(`View All ${section} clicked`);
@@ -75,11 +101,11 @@ const Dashboard = () => {
           />
           <View style={styles.welcomeUsername}>
             <Text style={styles.welcomeText}>Welcome</Text>
-            <Text style={styles.usernameText}>Username</Text>
+            <Text style={styles.usernameText}>{user_name}</Text>
           </View>
           <View style={styles.spacer} />
           <View style={styles.locationContainer}>
-            <Text style={styles.locationText}>Cagayan de Oro</Text>
+            <Text style={styles.locationText}>{country}</Text>
             <MaterialCommunityIcons
               name="map-marker"
               color="#FFC42B"

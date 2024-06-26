@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,12 +10,42 @@ import {
   TouchableOpacity,
   onChangeSearch,
   searchQuery,
+  BackHandler
 } from "react-native";
 import CustomHeader from "../../elements/CustomHeader";
 import { Searchbar } from "react-native-paper";
 import Scrollview from "../../elements/ScrollViewScreens";
+import { getUser } from '../../../services/authentication/authServices';
 
 export default function HomeScreen({ navigation }) {
+  const [user_name, setUsername] = useState("");
+  const [country, setCountry] = useState("");
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userData = await getUser();
+        setUsername(userData.user_name); // Assuming the user object contains a username property
+        setCountry(userData.country); // Assuming the user object contains a location property
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      // Do nothing when the back button is pressed
+      return true;
+    });
+
+    // Cleanup the event listener when the component unmounts
+    return () => backHandler.remove();
+  }, []);
+
+
   const colors = ["#FF6961", "#AEC6CF", "#FDFD96", "#77DD77"];
   return (
     <ImageBackground style={styles.background}>
@@ -34,10 +64,10 @@ export default function HomeScreen({ navigation }) {
             </View>
             <View>
               <Text style={styles.welcomeText}>Welcome,</Text>
-              <Text style={styles.nameText}>Your Name</Text>
+              <Text style={styles.nameText}>{user_name}</Text>
             </View>
           </View>
-          <Text style={styles.locationText}>Cagayan de Oro</Text>
+          <Text style={styles.locationText}>{country}</Text>
         </View>
         <Searchbar
           placeholder="Search Events"

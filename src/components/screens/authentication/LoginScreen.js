@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import {
   SafeAreaView,
   KeyboardAvoidingView,
@@ -13,67 +13,86 @@ import {
   Provider as PaperProvider,
   TextInput,
   Text,
-} from "react-native-paper"
+} from "react-native-paper";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation } from "@react-navigation/native";
+import Toast from "react-native-root-toast";
+import { AuthContext } from "../../../services/authentication/authContext";
+import { getUser } from "../../../services/authentication/authServices";
 import {
   widthPercentageToDP,
   heightPercentageToDP,
 } from "react-native-responsive-screen";
-import { useState } from "react";
-import Toast from "react-native-root-toast";
-import fetchServices from "../../../services/authentication/fetchServices";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const LoginScreen = () => {
-  const navigator = useNavigation();
-
+const LoginScreen = ( {navigation} ) => {
   const [HideEntry, setHideEntry] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { signIn } = useContext(AuthContext); 
 
-  const CustomIcon = ({ name, size, color }) => {
+  const CustomIcon = ({ name, size = 24, color = "black" }) => {
     return <Icon name={name} size={size} color={color} />;
   };
-  
+
   const showToast = (message = "Something went wrong") => {
-    Toast.show(message, 3000);
+    Toast.show(message, {
+      duration: Toast.durations.LONG,
+      position: Toast.positions.BOTTOM,
+    });
   };
 
   const handleLogin = async () => {
     try {
       setLoading(true);
-  
+
       if (email === "" || password === "") {
         showToast("Please input required data");
         setIsError(true);
         return;
       }
-  
-      const data = {
-        email,
-        password,
-      };
-  
-      const url = "http://192.168.29.137:8000/api/user/login"; // Replace with actual login endpoint
-  
-      const result = await fetchServices.postData(url, data);
-  
-      if (result.token) {
-        // Store token in AsyncStorage
-        await AsyncStorage.setItem('token', result.token);
-      } else {
-        showToast("Login failed");
-      }
+
+      await signIn(email, password); // Use signIn from AuthContext to handle login
+      showToast('Login successful');
+
+      // Fetch user details after successful login
+      const user = await getUser();
+      
+      // Navigate based on user's role
+      navigateBasedOnRole(user.role_id);
+
+      // Reset the form
+      resetForm();
     } catch (error) {
-      console.error("Login error:", error);
-      showToast("An error occurred during login.");
+      console.error('Login error:', error);
+      showToast('An error occurred during login.');
     } finally {
       setLoading(false);
     }
   };
+
+  const resetForm = () => {
+    setEmail("");
+    setPassword("");
+  };
+
+  const navigateBasedOnRole = (role_id) => {
+    try {
+      if (role_id === 2) {
+        console.log('Navigating to ParticipantsStack...');
+        navigation.navigate("ParticipantsStack");
+      } else if (role_id === 3) {
+        console.log('Navigating to OrganizerStack...');
+        navigation.navigate('OrganizerStack');
+      } else {
+        showToast('Role not recognized');
+      }
+    } catch (error) {
+      console.error('Navigation error:', error);
+      showToast('An error occurred during navigation.');
+    }
+  };
+  
 
   const toggleSecureEntry = () => {
     setHideEntry(!HideEntry);
@@ -168,7 +187,7 @@ const LoginScreen = () => {
                 <Button
                   labelStyle={{ color: "#FFC42B" }}
                   onPress={() => {
-                    navigator.navigate("AccountRecoveryScreen");
+                    navigation.navigate("AccountRecoveryScreen");
                   }}
                 >
                   Recover
@@ -198,7 +217,7 @@ const LoginScreen = () => {
                   mode="text"
                   labelStyle={{ color: "#FFC42B" }}
                   onPress={() => {
-                    navigator.navigate("RegisterScreen");
+                    navigation.navigate("RegisterScreen");
                   }}
                   loading={loading}
                   disabled={loading}

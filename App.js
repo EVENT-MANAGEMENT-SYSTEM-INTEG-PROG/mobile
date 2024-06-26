@@ -1,29 +1,20 @@
 import React from 'react';
-import { StyleSheet } from "react-native";
 import { NavigationContainer } from '@react-navigation/native';
-import Navigator from './src/helper/Navigator';
 import { PaperProvider } from 'react-native-paper';
-
+import Navigator from './src/helper/Navigator'; 
+import { AuthProvider } from './src/services/authentication/authContext';
 
 
 const App = () => {
   return (
-    <PaperProvider style={styles.container}>
+    <PaperProvider>
+      <AuthProvider>
         <NavigationContainer>
           <Navigator />
         </NavigationContainer>
+      </AuthProvider>
     </PaperProvider>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
-
 
 export default App;

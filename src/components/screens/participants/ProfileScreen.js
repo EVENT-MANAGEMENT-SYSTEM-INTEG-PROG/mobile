@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   View,
   Text,
@@ -11,8 +11,41 @@ import {
 } from "react-native";
 import CustomHeader from "../../elements/CustomHeader";
 import Scrollview from "../../elements/ScrollViewScreens";
+import { AuthContext } from "../../../services/authentication/authContext";
+import { getUser } from '../../../services/authentication/authServices';
 
 const ProfileScreen = ({ navigation }) => {
+  const [first_name, setFirstname] = useState("");
+  const [last_name, setLastname] = useState("");
+  const [country, setCountry] = useState("");
+  const { signOut } = useContext(AuthContext);
+
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userData = await getUser();
+        setFirstname(userData.first_name); 
+        setLastname(userData.last_name); 
+        setCountry(userData.country); 
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(); // Call logout function from authService.js
+      navigation.navigate('LoginScreen'); // Navigate to LoginScreen upon successful logout
+    } catch (error) {
+      console.error('Error logging out:', error);
+      // Handle error (if any)
+    }
+  };
+
   return (
     <ImageBackground
       source={require("../../../../assets/participants_images/Wallpaper.png")}
@@ -27,8 +60,8 @@ const ProfileScreen = ({ navigation }) => {
               style={styles.addPhotoButton}
             />
           </View>
-          <Text style={styles.serviceProviderName}>Service Provider Name</Text>
-          <Text style={styles.address}>Event Service Provider Address</Text>
+          <Text style={styles.serviceProviderName}>{first_name} {last_name}</Text>
+          <Text style={styles.address}>{country}</Text>
           <View style={styles.timeContainer}>
             <Text style={styles.timeText}>Open: 06:00 am</Text>
             <Text style={styles.timeText}>Close: 09:00 pm</Text>
@@ -37,7 +70,7 @@ const ProfileScreen = ({ navigation }) => {
             <TouchableOpacity style={styles.editButton}>
               <Text style={styles.buttonText}>Edit Profile</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.logoutButton}>
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
               <Text style={styles.buttonText}>Logout</Text>
             </TouchableOpacity>
           </View>
@@ -48,39 +81,6 @@ const ProfileScreen = ({ navigation }) => {
     </ImageBackground>
   );
 };
-
-// const events = [
-//   {
-//     image: "https://link-to-image.com/image1.jpg",
-//     title: "Mr. & Mrs. Malik Wedding",
-//     date: "23 Sept, 23",
-//     location: "Cagayan de Oro City",
-//   },
-//   {
-//     image: "https://link-to-image.com/image2.jpg",
-//     title: "Barbella's Birthday",
-//     date: "12 August, 23",
-//     location: "Cagayan de Oro City",
-//   },
-//   {
-//     image: "https://link-to-image.com/image3.jpg",
-//     title: "Class of 1979 Reunion",
-//     date: "25-27 July, 23",
-//     location: "Cagayan de Oro City",
-//   },
-//   {
-//     image: "https://link-to-image.com/image4.jpg",
-//     title: "Barbella's Debut",
-//     date: "23 Sept, 25",
-//     location: "Cagayan de Oro City",
-//   },
-//   {
-//     image: "https://link-to-image.com/image5.jpg",
-//     title: "Kids Party",
-//     date: "12 August, 24",
-//     location: "Cagayan de Oro City",
-//   },
-// ];
 
 const styles = StyleSheet.create({
   container: {
@@ -96,9 +96,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     marginBottom: 20,
-  },
-  backgroundImage: {
-    resizeMode: "cover",
   },
   photoContainer: {
     width: 100,
@@ -158,52 +155,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     marginVertical: 20,
-  },
-  eventsContainer: {
-    flexDirection: "row",
-  },
-  eventCard: {
-    backgroundColor: "#FFFFFF",
-    padding: 10,
-    borderRadius: 10,
-    marginRight: 10,
-    alignItems: "center",
-    width: 200,
-  },
-  eventImageContainer: {
-    position: "relative",
-  },
-  eventImage: {
-    width: "100%",
-    height: 100,
-    borderRadius: 10,
-  },
-  addEventButton: {
-    position: "absolute",
-    top: 5,
-    right: 5,
-    backgroundColor: "#FFD700",
-    borderRadius: 50,
-    width: 25,
-    height: 25,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  addEventButtonText: {
-    color: "#000",
-    fontSize: 18,
-  },
-  eventTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  eventDate: {
-    fontSize: 14,
-    color: "#555",
-  },
-  eventLocation: {
-    fontSize: 14,
-    color: "#555",
   },
 });
 
