@@ -21,6 +21,7 @@ const ProfileScreen = ({ navigation }) => {
   const [country, setCountry] = useState("");
   const { signOut } = useContext(AuthContext);
 
+  const [userData, setUserData] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editedProfile, setEditedProfile] = useState({
     first_name: "",
@@ -38,7 +39,11 @@ const ProfileScreen = ({ navigation }) => {
     const fetchUserData = async () => {
       try {
         const userData = await getUser();
-        setEditedProfile(userData);
+        setUserData(userData);
+        setFirstname(userData.first_name);
+        setLastname(userData.last_name);
+        setCountry(userData.country);
+        setEditedProfile(userData); // Initialize editedProfile with fetched data
       } catch (error) {
         console.error('Failed to fetch user data:', error);
       }
@@ -60,11 +65,17 @@ const ProfileScreen = ({ navigation }) => {
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
     // Reset edited profile state if closing modal
-    if (!isModalVisible) {
+    if (!isModalVisible && userData) {
       setEditedProfile({
-        first_name: first_name,
-        last_name: last_name,
-        country: country,
+        first_name: userData.first_name,
+        last_name: userData.last_name,
+        gender: userData.gender,
+        date_of_birth: userData.date_of_birth,
+        email: userData.email,
+        user_name: userData.user_name,
+        password: userData.password,
+        mobile_number: userData.mobile_number,
+        country: userData.country,
       });
     }
   };
