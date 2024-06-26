@@ -14,18 +14,19 @@ const Dashboard = ( {navigation} ) => {
   const [country, setCountry] = useState("");
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const userData = await getUser();
-        setUsername(userData.user_name); // Assuming the user object contains a username property
-        setCountry(userData.country); // Assuming the user object contains a location property
-      } catch (error) {
-        console.error('Failed to fetch user data:', error);
-      }
-    };
 
     fetchUserData();
   }, []);
+
+  const fetchUserData = async () => {
+    try {
+      const userData = await getUser();
+      setUsername(userData.user_name); // Assuming the user object contains a username property
+      setCountry(userData.country); // Assuming the user object contains a location property
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+    }
+  };
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {

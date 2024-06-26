@@ -5,14 +5,15 @@ import {
   StyleSheet,
   Button,
   ScrollView,
-  Image,
   ImageBackground,
   TouchableOpacity,
+  Modal,
+  TextInput,
 } from "react-native";
 import CustomHeader from "../../elements/CustomHeader";
 import Scrollview from "../../elements/ScrollViewScreens";
 import { AuthContext } from "../../../services/authentication/authContext";
-import { getUser } from '../../../services/authentication/authServices';
+import { getUser, updateAccount } from '../../../services/authentication/authServices';
 
 const ProfileScreen = ({ navigation }) => {
   const [first_name, setFirstname] = useState("");
@@ -20,14 +21,24 @@ const ProfileScreen = ({ navigation }) => {
   const [country, setCountry] = useState("");
   const { signOut } = useContext(AuthContext);
 
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editedProfile, setEditedProfile] = useState({
+    first_name: "",
+    last_name: "",
+    gender: "",
+    date_of_birth: "",
+    email: "",
+    user_name: "",
+    password: "", 
+    mobile_number: "",
+    country: "",
+  });
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const userData = await getUser();
-        setFirstname(userData.first_name); 
-        setLastname(userData.last_name); 
-        setCountry(userData.country); 
+        setEditedProfile(userData);
       } catch (error) {
         console.error('Failed to fetch user data:', error);
       }
@@ -43,6 +54,36 @@ const ProfileScreen = ({ navigation }) => {
     } catch (error) {
       console.error('Error logging out:', error);
       // Handle error (if any)
+    }
+  };
+
+  const toggleModal = () => {
+    setIsModalVisible(!isModalVisible);
+    // Reset edited profile state if closing modal
+    if (!isModalVisible) {
+      setEditedProfile({
+        first_name: first_name,
+        last_name: last_name,
+        country: country,
+      });
+    }
+  };
+
+  const saveEditedProfile = async () => {
+    try {
+      // Implement updateAccount function to update user account
+      await updateAccount(editedProfile); // Assuming updateAccount accepts updated profile data
+
+      // Update displayed profile info with edited data
+      setFirstname(editedProfile.first_name);
+      setLastname(editedProfile.last_name);
+      setCountry(editedProfile.country);
+
+      // Close the modal after saving
+      toggleModal();
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      // Handle error, show error message, etc.
     }
   };
 
@@ -62,12 +103,8 @@ const ProfileScreen = ({ navigation }) => {
           </View>
           <Text style={styles.serviceProviderName}>{first_name} {last_name}</Text>
           <Text style={styles.address}>{country}</Text>
-          <View style={styles.timeContainer}>
-            <Text style={styles.timeText}>Open: 06:00 am</Text>
-            <Text style={styles.timeText}>Close: 09:00 pm</Text>
-          </View>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.editButton}>
+            <TouchableOpacity style={styles.editButton} onPress={toggleModal}>
               <Text style={styles.buttonText}>Edit Profile</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
@@ -78,6 +115,107 @@ const ProfileScreen = ({ navigation }) => {
         <Text style={styles.popularEventsTitle}>Popular Events</Text>
         <Scrollview />
       </ScrollView>
+
+      {/* Modal for editing profile */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={toggleModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Edit Profile</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="First Name"
+              value={editedProfile.first_name}
+              onChangeText={(text) =>
+                setEditedProfile({ ...editedProfile, first_name: text })
+              }
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Last Name"
+              value={editedProfile.last_name}
+              onChangeText={(text) =>
+                setEditedProfile({ ...editedProfile, last_name: text })
+              }
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Gender"
+              value={editedProfile.gender}
+              onChangeText={(text) =>
+                setEditedProfile({ ...editedProfile, gender: text })
+              }
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Date of Birth"
+              value={editedProfile.country}
+              onChangeText={(text) =>
+                setEditedProfile({ ...editedProfile, date_of_birth: text })
+              }
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={editedProfile.email}
+              onChangeText={(text) =>
+                setEditedProfile({ ...editedProfile, email: text })
+              }
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Username"
+              value={editedProfile.user_name}
+              onChangeText={(text) =>
+                setEditedProfile({ ...editedProfile, user_name: text })
+              }
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              value={editedProfile.password}
+              onChangeText={(text) =>
+                setEditedProfile({ ...editedProfile, password: text })
+              }
+              secureTextEntry={true}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Mobile Number"
+              value={editedProfile.mobile_number}
+              onChangeText={(text) =>
+                setEditedProfile({ ...editedProfile, mobile_number: text })
+              }
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Country"
+              value={editedProfile.country}
+              onChangeText={(text) =>
+                setEditedProfile({ ...editedProfile, country: text })
+              }
+            />
+            <View style={styles.modalButtonContainer}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.saveButton]}
+                onPress={saveEditedProfile}
+              >
+                <Text style={styles.buttonText}>Save</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={toggleModal}
+              >
+                <Text style={styles.buttonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ImageBackground>
   );
 };
@@ -119,20 +257,11 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     color: "white",
   },
-  timeContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    marginVertical: 10,
-    color: "white",
-  },
-  timeText: {
-    color: "white",
-  },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
     width: "100%",
+    marginTop: 20,
   },
   editButton: {
     backgroundColor: "#FFD700",
@@ -155,6 +284,51 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     marginVertical: 20,
+  },
+  // Modal styles
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    width: "80%",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  input: {
+    height: 40,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+  },
+  modalButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 20,
+  },
+  modalButton: {
+    borderRadius: 5,
+    padding: 10,
+    width: "40%",
+    alignItems: "center",
+  },
+  saveButton: {
+    backgroundColor: "#FFD700",
+    marginRight: 10,
+  },
+  cancelButton: {
+    backgroundColor: "#666",
   },
 });
 
