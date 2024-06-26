@@ -6,7 +6,7 @@ To get started with the mobile app, follow these steps: (use Command Prompt or C
 
 ```sh
 # Clone the repository
-git clone https://github.com/EVENT-MANAGEMENT-SYSTEM-INTEG-PROG/test.git
+git clone https://github.com/EVENT-MANAGEMENT-SYSTEM-INTEG-PROG/mobile.git
 
 # Go the the Directory
 cd test
