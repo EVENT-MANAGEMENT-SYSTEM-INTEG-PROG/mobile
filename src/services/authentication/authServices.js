@@ -42,7 +42,7 @@ export const signup = async (userData) => {
 
 export const updateAccount = async (userData) => {
     try {
-        await api.put('/user/me', userData);
+        await api.patch('/user/me', userData);
     } catch (error) {
         console.error('Update error:', error);
         throw error;
