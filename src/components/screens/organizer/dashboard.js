@@ -8,15 +8,17 @@ import NavBar from './nav';
 import FindEvent from './findevent';
 import Create from './create';
 import { getUser } from '../../../services/authentication/authServices';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Dashboard = ( {navigation} ) => {
   const [user_name, setUsername] = useState("");
   const [country, setCountry] = useState("");
 
-  useEffect(() => {
-
-    fetchUserData();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUserData();
+    }, [])
+  );
 
   const fetchUserData = async () => {
     try {

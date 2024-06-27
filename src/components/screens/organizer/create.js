@@ -1,56 +1,229 @@
-// create.js
-
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'; 
-import { useNavigation } from '@react-navigation/native';
-import { Avatar, Provider as PaperProvider } from 'react-native-paper'; 
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+  Button,
+  Alert,
+  KeyboardAvoidingView,
+  Image,
+  ScrollView,
+  Platform,
+  ActivityIndicator, // Import ActivityIndicator
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Provider as PaperProvider } from 'react-native-paper';
 import NavBar from './nav';
+import { createEvent } from '../../../services/organizer/organizerServices'; // Adjust the import path as needed
+import { getUser } from '../../../services/authentication/authServices';
+import * as ImagePicker from 'expo-image-picker'; // Import expo-image-picker
+import * as FileSystem from 'expo-file-system'; // Import expo-file-system
+import { useFocusEffect } from '@react-navigation/native';
 
-const Create = () => {
-  const navigation = useNavigation(); 
+const Create = ({ navigation }) => {
+  const [eventName, setEventName] = useState('');
+  const [eventDescription, setEventDescription] = useState('');
+  const [eventDate, setEventDate] = useState('');
+  const [eventTime, setEventTime] = useState('');
+  const [eventLocation, setEventLocation] = useState('');
+  const [organizer, setOrganizer] = useState('');
+  const [participants, setParticipants] = useState('');
+  const [eventImage, setEventImage] = useState(null); // State for storing the selected image URI
+  const [isLoading, setIsLoading] = useState(false); // State for loading indicator
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUserData();
+    }, [])
+  );
+
+  const fetchUserData = async () => {
+    try {
+      const userData = await getUser();
+      setOrganizer(`${userData.first_name} ${userData.last_name}`);
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+      Alert.alert('Error', 'Failed to fetch user data');
+    }
+  };
+
+  const handleCreateEvent = async () => {
+    try {
+      setIsLoading(true); // Start loading indicator
+
+      const participantsArray = participants.split(',').map(email => email.trim());
+      let base64Image = null;
+
+      if (eventImage) {
+        const imageUri = eventImage.uri;
+        const imageBase64 = await FileSystem.readAsStringAsync(imageUri, { encoding: FileSystem.EncodingType.Base64 });
+        base64Image = `data:image/jpeg;base64,${imageBase64}`;
+      }
+
+      const eventData = {
+        event_name: eventName,
+        event_description: eventDescription,
+        event_date: eventDate,
+        event_time: eventTime,
+        event_location: eventLocation,
+        event_status: 'Upcoming',
+        organizer: organizer,
+        participants: participantsArray,
+        event_image: base64Image,
+      };
+
+      await createEvent(eventData);
+      setIsLoading(false); // Stop loading indicator on success
+      Alert.alert('Success', 'Event created successfully', [
+        { text: 'OK', onPress: () => navigation.goBack() }
+      ]);
+      resetForm();
+    } catch (error) {
+      console.error('Event creation error:', error);
+      setIsLoading(false); // Stop loading indicator on error
+      Alert.alert('Error', 'Failed to create event');
+    }
+  };
+
+  const resetForm = () => {
+    setEventName("");
+    setEventDescription("");
+    setEventDate("");
+    setEventTime("");
+    setEventLocation("");
+    setParticipants("");
+    setEventImage(null); // Reset image state
+  };
+
+  const handleImageUpload = async () => {
+    try {
+      let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (permissionResult.granted === false) {
+        Alert.alert('Permission to access media library is required!');
+        return;
+      }
+
+      let pickerResult = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      if (!pickerResult.cancelled) {
+        setEventImage({ uri: pickerResult.assets[0].uri }); // Use pickerResult.assets[0].uri
+      }
+    } catch (error) {
+      console.error('ImagePicker Error:', error);
+      Alert.alert('Error', 'Failed to pick an image');
+    }
+  };
 
   return (
     <PaperProvider>
-      <View style={styles.container}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0} // Adjust this value if necessary
+      >
         {/* Burger icon to open sidebar */}
         <TouchableOpacity onPress={() => navigation.openDrawer()} style={styles.menuButton}>
           <Ionicons name="menu" size={32} color="white" />
         </TouchableOpacity>
 
-        <View style={styles.profileSection}>
-          <Avatar.Image
-            size={50}
-            source={require('../../../../assets/organizer_images/pro_pic.png')}
-            style={styles.profilePicture}
-          />
-          <View style={styles.welcomeUsername}>
-            <Text style={styles.welcomeText}>Welcome</Text>
-            <Text style={styles.usernameText}>Username</Text>
-          </View>
-          <View style={styles.spacer} />
-          <View style={styles.locationContainer}>
-            <Text style={styles.locationText}>Cagayan de Oro</Text>
-            <MaterialCommunityIcons
-              name="map-marker"
+        <ScrollView style={{ marginTop: 15, marginBottom: 60 }}>
+          {isLoading && (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#FFC42B" />
+            </View>
+          )}
+          
+          <View style={styles.formContainer}>
+            <Text style={styles.label}>Event Name</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter Event Name"
+              placeholderTextColor="#888"
+              value={eventName}
+              onChangeText={setEventName}
+            />
+
+            {/* Add image upload */}
+            <TouchableOpacity onPress={handleImageUpload} style={styles.imagePicker}>
+              {eventImage ? (
+                <Image source={{ uri: eventImage.uri }} style={styles.eventImage} />
+              ) : (
+                <Text style={styles.imagePickerText}>Select Event Image</Text>
+              )}
+            </TouchableOpacity>
+
+            <Text style={styles.label}>Event Description</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter Event Description"
+              placeholderTextColor="#888"
+              value={eventDescription}
+              onChangeText={setEventDescription}
+            />
+
+            <Text style={styles.label}>Event Date</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="YYYY-MM-DD"
+              placeholderTextColor="#888"
+              value={eventDate}
+              onChangeText={setEventDate}
+            />
+
+            <Text style={styles.label}>Event Time</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="HH:MM:SS"
+              placeholderTextColor="#888"
+              value={eventTime}
+              onChangeText={setEventTime}
+            />
+
+            <Text style={styles.label}>Event Location</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter Event Location"
+              placeholderTextColor="#888"
+              value={eventLocation}
+              onChangeText={setEventLocation}
+            />
+
+            <Text style={styles.label}>Organizer</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter Organizer Name"
+              placeholderTextColor="#888"
+              value={organizer}
+              onChangeText={setOrganizer}
+              editable={false} // Prevent editing if needed
+            />
+
+            <Text style={styles.label}>Participants (comma-separated emails)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter Participant Emails"
+              placeholderTextColor="#888"
+              value={participants}
+              onChangeText={setParticipants}
+            />
+
+            <Button
+              title="Create Event"
+              onPress={handleCreateEvent}
               color="#FFC42B"
-              size={23}
-              style={styles.locationIcon}
             />
           </View>
-        </View>
-
-        <View style={styles.searchContainer}>
-          <Text style={styles.label}>Venue Location</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter Venue Location"
-            placeholderTextColor="#888"
-          />
-        </View>
+        </ScrollView>
 
         <NavBar />
-      </View>
+      </KeyboardAvoidingView>
     </PaperProvider>
   );
 };
@@ -67,48 +240,8 @@ const styles = StyleSheet.create({
     left: 20,
     zIndex: 1,
   },
-  profileSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-    marginTop: 80, // To provide space for the burger icon
-  },
-  profilePicture: {
-    marginRight: 10,
-  },
-  welcomeUsername: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    marginRight: 'auto',
-  },
-  welcomeText: {
-    fontSize: 12,
-    color: '#FFF',
-  },
-  usernameText: {
-    fontSize: 12,
-    color: '#FFF',
-    fontWeight: '600',
-  },
-  spacer: {
-    flex: 1,
-  },
-  locationContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  locationText: {
-    fontSize: 12,
-    color: '#FFF',
-    textDecorationLine: 'underline',
-    marginRight: 5,
-  },
-  locationIcon: {
-    marginRight: 5,
-  },
-  searchContainer: {
-    marginTop: 20,
+  formContainer: {
+    marginTop: 50,
   },
   label: {
     fontSize: 16,
@@ -122,6 +255,34 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
     fontSize: 14,
+    marginBottom: 10,
+  },
+  imagePicker: {
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  imagePickerText: {
+    color: '#FFC42B',
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  eventImage: {
+    width: 200,
+    height: 200,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
   },
 });
 
