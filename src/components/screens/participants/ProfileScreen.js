@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import CustomHeader from "../../elements/CustomHeader";
 import Scrollview from "../../elements/ScrollViewScreens";
 import { AuthContext } from "../../../services/authentication/authContext";
 import { getUser, updateAccount } from '../../../services/authentication/authServices';
+import { useFocusEffect } from "@react-navigation/native";
 
 const ProfileScreen = ({ navigation }) => {
   const [first_name, setFirstname] = useState("");
@@ -35,22 +36,24 @@ const ProfileScreen = ({ navigation }) => {
     country: "",
   });
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const userData = await getUser();
-        setUserData(userData);
-        setFirstname(userData.first_name);
-        setLastname(userData.last_name);
-        setCountry(userData.country);
-        setEditedProfile(userData); // Initialize editedProfile with fetched data
-      } catch (error) {
-        console.error('Failed to fetch user data:', error);
-      }
-    };
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUserData();
+    }, [])
+  );
 
-    fetchUserData();
-  }, []);
+  const fetchUserData = async () => {
+    try {
+      const userData = await getUser();
+      setUserData(userData);
+      setFirstname(userData.first_name);
+      setLastname(userData.last_name);
+      setCountry(userData.country);
+      setEditedProfile(userData); // Initialize editedProfile with fetched data
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -77,6 +80,7 @@ const ProfileScreen = ({ navigation }) => {
         mobile_number: userData.mobile_number,
         country: userData.country,
       });
+      fetchUserData();
     }
   };
 

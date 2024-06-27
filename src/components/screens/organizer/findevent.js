@@ -8,7 +8,6 @@ import {
   Image,
   Modal,
   TextInput,
-  ActivityIndicator,
   Alert,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
