@@ -198,7 +198,7 @@ const RegisterScreen = () => {
                   style={styles.inputStyle}
                   mode="outlined"
                   label="Date of Birth"
-                  placeholder="Enter your date of birth"
+                  placeholder="YYYY-MM-DD"
                   error={isError}
                   value={date_of_birth}
                   onChangeText={(text) => setDateOfBirth(text)}
