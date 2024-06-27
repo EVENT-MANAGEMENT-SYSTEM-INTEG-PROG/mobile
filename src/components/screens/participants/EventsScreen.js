@@ -9,9 +9,9 @@ import {
 } from "react-native";
 import { Searchbar } from "react-native-paper";
 import CarouselView from "../../elements/CarouselView"; // Assuming this is a date selector carousel
-import ImageCards from "../../elements/ImageCards"; // Assuming these are cards for events on selected dates
 import { useNavigation } from "@react-navigation/native";
 import CustomHeader from "../../elements/CustomHeader";
+import Cards from "../../elements/Cards";
 
 export default function EventsScreen() {
   const navigation = useNavigation();
@@ -73,7 +73,7 @@ export default function EventsScreen() {
         />
         <CarouselView />
         <Text style={styles.title}>EVENTS</Text>
-        <ImageCards />
+          <Cards />
         <View style={styles.marginbottom}></View>
       </ScrollView>
     </ImageBackground>
@@ -84,6 +84,7 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 70,
     marginHorizontal: 20,
+    paddingBottom: 50,
   },
   background: {
     backgroundColor: "black",
