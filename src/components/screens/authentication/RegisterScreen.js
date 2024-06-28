@@ -5,6 +5,8 @@ import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-root-toast";
 import { widthPercentageToDP, heightPercentageToDP } from "react-native-responsive-screen";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import RNPickerSelect from 'react-native-picker-select';
 import { signup } from "../../../services/authentication/authServices";
 
 const RegisterScreen = () => {
@@ -13,7 +15,7 @@ const RegisterScreen = () => {
   const [first_name, setFirstName] = useState("");
   const [last_name, setLastName] = useState("");
   const [gender, setGender] = useState("");
-  const [date_of_birth, setDateOfBirth] = useState("");
+  const [date_of_birth, setDateOfBirth] = useState(new Date());
   const [country, setCountry] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,6 +24,7 @@ const RegisterScreen = () => {
   const [loading, setLoading] = useState(false);
   const [HideEntry, setHideEntry] = useState(true);
   const [mobile_number, setMobileNumber] = useState("");
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const toggleSecureEntry = () => {
     setHideEntry(!HideEntry);
@@ -31,7 +34,7 @@ const RegisterScreen = () => {
     Toast.show(message, { duration: Toast.durations.LONG });
   };
 
-  const CustomIcon = ({ name, size, color }) => {
+  const CustomIcon = ({ name = "account", size = 24, color = "black" }) => {
     return <Icon name={name} size={size} color={color} />;
   };
 
@@ -66,7 +69,7 @@ const RegisterScreen = () => {
         first_name,
         last_name,
         gender,
-        date_of_birth,
+        date_of_birth: date_of_birth.toISOString().split('T')[0],
         country,
         email,
         password,
@@ -101,13 +104,19 @@ const RegisterScreen = () => {
     setFirstName("");
     setLastName("");
     setGender("");
-    setDateOfBirth("");
+    setDateOfBirth(new Date());
     setCountry("");
     setEmail("");
     setPassword("");
     setRepassword("");
     setMobileNumber("");
     setIsError(false);
+  };
+
+  const onDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date_of_birth;
+    setShowDatePicker(Platform.OS === 'ios');
+    setDateOfBirth(currentDate);
   };
 
   return (
@@ -176,27 +185,55 @@ const RegisterScreen = () => {
                   }}
                   left={<TextInput.Icon icon={() => <CustomIcon name="account" size={24} color="black" />} />}
                 />
-                <TextInput
-                  style={styles.inputStyle}
-                  mode="outlined"
-                  label="Gender"
-                  placeholder="Enter your gender"
-                  error={isError}
-                  value={gender}
-                  onChangeText={(text) => setGender(text)}
-                  theme={{
-                    colors: {
-                      primary: "#FFC42B",
-                      text: "#000",
-                      placeholder: "#FFC42B",
-                      background: "#fff",
-                    },
-                  }}
-                  left={<TextInput.Icon icon={() => <CustomIcon name="gender-male-female" size={24} color="black" />} />}
+                <RNPickerSelect
+                  onValueChange={(value) => setGender(value)}
+                  items={[
+                    { label: "Male", value: "male" },
+                    { label: "Female", value: "female" },
+                    { label: "Other", value: "other" },
+                  ]}
+                  style={pickerSelectStyles}
+                  placeholder={{ label: "Select your gender", value: null }}
                 />
-                <TextInput
-                  style={styles.inputStyle}
+                {gender === "other" && (
+                  <TextInput
+                    style={styles.inputStyle}
+                    mode="outlined"
+                    label="Specify Gender"
+                    placeholder="Enter your gender"
+                    error={isError}
+                    value={gender}
+                    onChangeText={(text) => setGender(text)}
+                    theme={{
+                      colors: {
+                        primary: "#FFC42B",
+                        text: "#000",
+                        placeholder: "#FFC42B",
+                        background: "#fff",
+                      },
+                    }}
+                    left={<TextInput.Icon icon={() => <CustomIcon name="gender-male-female" size={24} color="black" />} />}
+                  />
+                )}
+                <Button
+                  onPress={() => setShowDatePicker(true)}
                   mode="outlined"
+<<<<<<< HEAD
+                  style={styles.datePickerButton}
+                  labelStyle={{ color: "#000" }}
+                >
+                  {date_of_birth ? date_of_birth.toDateString() : "Select date of birth"}
+                </Button>
+                {showDatePicker && (
+                  <DateTimePicker
+                    value={date_of_birth}
+                    mode="date"
+                    display="default"
+                    onChange={onDateChange}
+                    maximumDate={new Date()}
+                  />
+                )}
+=======
                   label="Date of Birth"
                   placeholder="YYYY-MM-DD"
                   error={isError}
@@ -212,6 +249,7 @@ const RegisterScreen = () => {
                   }}
                   left={<TextInput.Icon icon={() => <CustomIcon name="calendar" size={24} color="black" />} />}
                 />
+>>>>>>> 8692045e8da68b0b06533d82d56a9d6293ca1f90
                 <TextInput
                   style={styles.inputStyle}
                   mode="outlined"
@@ -252,8 +290,9 @@ const RegisterScreen = () => {
                 <TextInput
                   style={styles.inputStyle}
                   mode="outlined"
-                  label="Phone number"
-                  placeholder="Enter your phone number"
+                  label="Mobile Number"
+                  placeholder="Enter your mobile number"
+                  inputMode="tel"
                   value={mobile_number}
                   error={isError}
                   onChangeText={(text) => setMobileNumber(text)}
@@ -323,7 +362,7 @@ const RegisterScreen = () => {
                   style={styles.buttonStyle}
                   mode="contained"
                   onPress={handleRegistration}
-                  labelStyle={{ color: "black", fontWeight: "bold"  }}
+                  labelStyle={{ color: "black", fontWeight: "bold" }}
                 >
                   Create Account
                 </Button>
@@ -383,6 +422,44 @@ const styles = StyleSheet.create({
     height: heightPercentageToDP("5%"),
     marginBottom: heightPercentageToDP("2%"),
     backgroundColor: "#FFC42B",
+  },
+  datePickerButton: {
+    width: widthPercentageToDP("80%"),
+    height: heightPercentageToDP("5%"),
+    marginBottom: heightPercentageToDP("2%"),
+    borderColor: "#FFC42B",
+    borderWidth: 1,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});
+
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: "#FFC42B",
+    color: "black",
+    paddingRight: 30, // to ensure the text is never behind the icon
+    width: widthPercentageToDP("80%"),
+    marginBottom: heightPercentageToDP("2%"),
+    backgroundColor: "#fff",
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: "#FFC42B",
+    borderRadius: 8,
+    color: "black",
+    paddingRight: 30, // to ensure the text is never behind the icon
+    width: widthPercentageToDP("80%"),
+    marginBottom: heightPercentageToDP("2%"),
+    backgroundColor: "#fff",
   },
 });
 
