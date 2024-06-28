@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import NavBar from './nav';
 import Toast from 'react-native-root-toast';
 import { getUser, updateAccount } from '../../../services/authentication/authServices';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Profile = ({ navigation }) => {
   const [profile, setProfile] = useState({
@@ -32,10 +33,11 @@ const Profile = ({ navigation }) => {
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    // Fetch user data when component mounts
-    fetchUserData();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUserData();
+    }, [])
+  );
 
   const fetchUserData = async () => {
     try {

@@ -15,25 +15,29 @@ import {
 import CustomHeader from "../../elements/CustomHeader";
 import { Searchbar } from "react-native-paper";
 import Scrollview from "../../elements/ScrollViewScreens";
+import { getEvents } from "../../../services/organizer/organizerServices";
 import { getUser } from '../../../services/authentication/authServices';
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function HomeScreen({ navigation }) {
   const [user_name, setUsername] = useState("");
   const [country, setCountry] = useState("");
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const userData = await getUser();
-        setUsername(userData.user_name); // Assuming the user object contains a username property
-        setCountry(userData.country); // Assuming the user object contains a location property
-      } catch (error) {
-        console.error('Failed to fetch user data:', error);
-      }
-    };
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUserData();
+    }, [])
+  );
 
-    fetchUserData();
-  }, []);
+  const fetchUserData = async () => {
+    try {
+      const userData = await getUser();
+      setUsername(userData.user_name); // Assuming the user object contains a username property
+      setCountry(userData.country); // Assuming the user object contains a location property
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+    }
+  };
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -81,22 +85,7 @@ export default function HomeScreen({ navigation }) {
             <Text style={styles.viewAllText}>VIEW ALL</Text>
           </TouchableOpacity>
         </View>
-        <Scrollview/>
-        {/* <ScrollView horizontal style={styles.eventsContainer}>
-          {events.map((event, index) => (
-            <View key={index} style={styles.eventCard}>
-              <View style={styles.eventImageContainer}>
-                <Image source={event.image} style={styles.eventImage} />
-                <TouchableOpacity style={styles.addEventButton}>
-                  <Text style={styles.addEventButtonText}>+</Text>
-                </TouchableOpacity>
-              </View>
-              <Text style={styles.eventTitle}>{event.title}</Text>
-              <Text style={styles.eventDate}>{event.date}</Text>
-              <Text style={styles.eventLocation}>{event.location}</Text>
-            </View>
-          ))}
-        </ScrollView> */}
+        <Scrollview />
         <View style={styles.chooseEventSection}>
           <Text style={styles.sectionTitle}>Choose Event</Text>
           <View style={styles.eventTypes}>
@@ -131,39 +120,6 @@ export default function HomeScreen({ navigation }) {
     </ImageBackground>
   );
 }
-
-// const events = [
-//   {
-//     image: require("../../../../assets/participants_images/wedding.jpg"),
-//     title: "Mr. & Mrs. Malik Wedding",
-//     date: "23 Sept, 23",
-//     location: "Cagayan de Oro City",
-//   },
-//   {
-//     image: require("../../../../assets/participants_images/bday.jpg"),
-//     title: "Barbella's Birthday",
-//     date: "12 August, 23",
-//     location: "Cagayan de Oro City",
-//   },
-//   {
-//     image: require("../../../../assets/participants_images/reunion.jpg"),
-//     title: "Class of 1979 Reunion",
-//     date: "25-27 July, 23",
-//     location: "Cagayan de Oro City",
-//   },
-//   {
-//     image: require("../../../../assets/participants_images/debut.jpg"),
-//     title: "Barbella's Debut",
-//     date: "23 Sept, 25",
-//     location: "Cagayan de Oro City",
-//   },
-//   {
-//     image: require("../../../../assets/participants_images/kids.png"),
-//     title: "Kids Party",
-//     date: "12 August, 24",
-//     location: "Cagayan de Oro City",
-//   },
-// ];
 
 const eventTypes = ["Wedding", "Birthday", "Reunion", "Debut"];
 

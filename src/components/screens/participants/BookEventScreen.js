@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  SafeAreaView,
   StyleSheet,
   View,
   Text,
@@ -11,356 +10,236 @@ import {
   ScrollView,
   ImageBackground,
 } from "react-native";
-import Slider from "@react-native-community/slider";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-root-toast";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Calendar } from "react-native-calendars";
+import { createParticipant } from "../../../services/participants/participantsServices";
+import { getEvents } from "../../../services/organizer/organizerServices";
+import { getUser } from "../../../services/authentication/authServices";
 
 const BookEventScreen = () => {
-  const [eventType, setEventType] = useState("");
-  const [budget, setBudget] = useState([50000, 1000000]);
-  const [sliderValues, setSliderValues] = useState(budget);
   const [selectedDate, setSelectedDate] = useState(null);
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);
-  const [eventName, setEventName] = useState("");
-  const [description, setDescription] = useState("");
-  const [venueLocation, setVenueLocation] = useState("");
-  const [invitationMessage, setInvitationMessage] = useState("");
-  const [peopleToInvite, setPeopleToInvite] = useState("");
+  const [eventName, setEventName] = useState(""); // State for event name
+  const [registerStatus, setRegisterStatus] = useState("");
+  const [registerCode, setRegisterCode] = useState("");
+  const [events, setEvents] = useState([]);
+  const [user_id, setUser_id] = useState(""); // State for user_id
   const navigation = useNavigation();
-  const navigator = useNavigation();
 
+  // Fetch events on component focus
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchEvents();
+    }, [])
+  );
+
+  // Fetch user data on component focus
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUserData();
+    }, [])
+  );
+
+  // Function to fetch events and set eventName state
+  const fetchEvents = async () => {
+    try {
+      const eventsData = await getEvents(); // Assuming getEvents returns an array of events
+      if (eventsData.length > 0) {
+        setEventName(eventsData[0].event_name); // Set event_name from the first event (adjust this logic as per your requirement)
+        setEvents(eventsData); // Optionally set events array if needed elsewhere
+      }
+    } catch (error) {
+      console.error("Error fetching events:", error);
+      showToast("Failed to fetch events.");
+    }
+  };
+
+  // Function to fetch user data and set user_id state
+  const fetchUserData = async () => {
+    try {
+      const userData = await getUser();
+      setUser_id(userData.user_id); // Assuming userData has user_id property
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+    }
+  };
+
+  // Function to save the participant's event booking
   const saveEvent = async () => {
-    if (
-      !eventName ||
-      !eventType ||
-      !selectedDate ||
-      !description ||
-      !venueLocation ||
-      !invitationMessage ||
-      !peopleToInvite
-    ) {
+    if (!selectedDate || !registerStatus || !registerCode) {
       showToast("Please fill in all the details.");
       return;
     }
 
-    const bookedEvent = {
-      eventType,
-      eventName,
-      eventDate: selectedDate,
-      eventLocation: venueLocation,
-      description,
-      budget,
-      invitationMessage,
-      peopleToInvite,
+    // Find the event ID based on eventName (adjust logic as per your actual data structure)
+    const selectedEvent = events.find((event) => event.event_name === eventName);
+    if (!selectedEvent) {
+      showToast("Event not found.");
+      return;
+    }
+
+    const participantData = {
+      user_id: user_id, // Use the state value for user_id
+      event_id: selectedEvent.event_id,
+      register_status: registerStatus,
+      register_code: registerCode,
+      register_date: selectedDate,
+      register_time: new Date().toLocaleTimeString("en-GB"),
     };
 
     try {
-      await AsyncStorage.setItem(eventName, JSON.stringify(bookedEvent));
-      navigation.navigate("EventDetails", { eventName: eventName });
+      await createParticipant(participantData);
+      showToast("Event booked successfully!");
+      navigation.navigate("EventList"); // Navigate to EventList after booking
     } catch (e) {
-      console.error("Error saving event:", e);
-      showToast("Failed to save event.");
+      console.error("Error booking event:", e);
+      showToast("Failed to book event.");
     }
   };
 
+  // Function to show toast messages
   const showToast = (message = "Something went wrong") => {
     Toast.show(message, 3000);
   };
 
-  const formatNumber = (number) => {
-    if (typeof number === "number") {
-      return number.toLocaleString();
-    }
-    return "";
-  };
-
+  // Function to handle date change from calendar
   const handleDateChange = (date) => {
     setSelectedDate(date.dateString);
-    setIsCalendarVisible(false);
+    setIsCalendarVisible(false); // Close calendar after date selection
   };
 
+  // Function to toggle calendar visibility
   const toggleCalendar = () => {
     setIsCalendarVisible(!isCalendarVisible);
   };
 
-  const handleSliderValueChange = (values) => {
-    setSliderValues(values);
-    setBudget(values);
-  };
-
   return (
-    <ImageBackground style={styles.eventCreationPage}>
-      <TouchableOpacity
-        style={styles.goBackButton}
-        onPress={() => {
-          navigator.goBack();
-        }}
-      >
-        <Icon name="arrow-left" size={20} color="#fff" />
-      </TouchableOpacity>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.container}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
-      >
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1, marginHorizontal: 20 }}
+    <>
+      <ImageBackground style={styles.eventCreationPage}>
+        <TouchableOpacity
+          style={styles.goBackButton}
+          onPress={() => {
+            navigation.goBack();
+          }}
         >
-          <View style={styles.header}>
-            <Text style={styles.headerText}>Book Event</Text>
-          </View>
-          <View style={styles.eventTypeContainer}>
-            <ScrollView
-              horizontal
-              contentContainerStyle={styles.eventTypeButtonContainer}
-            >
-              <TouchableOpacity
-                style={[
-                  styles.eventTypeButton,
-                  eventType === "Wedding" && styles.selectedEventTypeButton,
-                ]}
-                onPress={() => setEventType("Wedding")}
-              >
-                <Text style={styles.eventTypeText}>Wedding</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.eventTypeButton,
-                  eventType === "Birthday" && styles.selectedEventTypeButton,
-                ]}
-                onPress={() => setEventType("Birthday")}
-              >
-                <Text style={styles.eventTypeText}>Birthday</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.eventTypeButton,
-                  eventType === "Reunion" && styles.selectedEventTypeButton,
-                ]}
-                onPress={() => setEventType("Reunion")}
-              >
-                <Text style={styles.eventTypeText}>Reunion</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.eventTypeButton,
-                  eventType === "Debut" && styles.selectedEventTypeButton,
-                ]}
-                onPress={() => setEventType("Debut")}
-              >
-                <Text style={styles.eventTypeText}>Debut</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.eventTypeButton,
-                  eventType === "KidsParty" && styles.selectedEventTypeButton,
-                ]}
-                onPress={() => setEventType("KidsParty")}
-              >
-                <Text style={styles.eventTypeText}>Kid's Party</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.eventTypeButton,
-                  eventType === "Valentines" && styles.selectedEventTypeButton,
-                ]}
-                onPress={() => setEventType("Valentines")}
-              >
-                <Text style={styles.eventTypeText}>Valentines</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.eventTypeButton,
-                  eventType === "Christmas" && styles.selectedEventTypeButton,
-                ]}
-                onPress={() => setEventType("Christmas")}
-              >
-                <Text style={styles.eventTypeText}>Christmas</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.eventTypeButton,
-                  eventType === "Alumni" && styles.selectedEventTypeButton,
-                ]}
-                onPress={() => setEventType("Alumni")}
-              >
-                <Text style={styles.eventTypeText}>Alumni</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.eventTypeButton,
-                  eventType === "Party" && styles.selectedEventTypeButton,
-                ]}
-                onPress={() => setEventType("Party")}
-              >
-                <Text style={styles.eventTypeText}>Party</Text>
-              </TouchableOpacity>
-            </ScrollView>
-          </View>
-          <View style={styles.formGroup}>
-            <TextInput
-              style={styles.input}
-              placeholder="Event Name"
-              value={eventName}
-              onChangeText={setEventName}
-            />
-          </View>
-          <View style={styles.formGroup}>
-            <TextInput
-              style={styles.input}
-              placeholder="Description"
-              multiline
-              value={description}
-              onChangeText={setDescription}
-            />
-          </View>
-          <View style={styles.formGroup}>
-            <TextInput
-              style={styles.input}
-              placeholder="Venue Location"
-              multiline
-              value={venueLocation}
-              onChangeText={setVenueLocation}
-            />
-          </View>
-          <View style={styles.formGroup}>
-            <TextInput
-              style={styles.input}
-              placeholder="Invitation Message"
-              multiline
-              value={invitationMessage}
-              onChangeText={setInvitationMessage}
-            />
-          </View>
-          <View style={styles.formGroup}>
-            <TextInput
-              style={styles.input}
-              placeholder="People to invite (e.g. random@gmail.com, random2@gmail.com)"
-              multiline
-              value={peopleToInvite}
-              onChangeText={setPeopleToInvite}
-            />
-          </View>
-          <View style={styles.formGroup}>
-            <TouchableOpacity
-              style={styles.calendarButton}
-              onPress={toggleCalendar}
-            >
-              <Text style={styles.calendarButtonText}>
-                Choose from calendar (EVENT DATE)
-              </Text>
-            </TouchableOpacity>
-            {isCalendarVisible && (
-              <View style={styles.calendarContainer}>
-                <Calendar
-                  onDayPress={handleDateChange}
-                  markedDates={{
-                    [selectedDate]: {
-                      selected: true,
-                      marked: true,
-                      selectedColor: "#e6b800",
-                    },
-                  }}
-                  theme={{
-                    backgroundColor: "#23232e",
-                    calendarBackground: "#23232e",
-                    textSectionTitleColor: "#cdb6c1",
-                    selectedDayBackgroundColor: "#e6b800",
-                    selectedDayTextColor: "#23232e",
-                    todayTextColor: "#e6b800",
-                    dayTextColor: "#fff",
-                    textDisabledColor: "#424242",
-                    dotColor: "#e6b800",
-                    selectedDotColor: "#23232e",
-                    arrowColor: "#e6b800",
-                  }}
+          <Icon name="arrow-left" size={20} color="#fff" />
+        </TouchableOpacity>
+        <ScrollView>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={styles.container}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+          >
+            <ScrollView contentContainerStyle={{ flexGrow: 1, marginHorizontal: 20 }}>
+              <View style={styles.header}>
+                <Text style={styles.headerText}>Book Event</Text>
+              </View>
+              <View style={styles.formGroup}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Event Name"
+                  value={eventName}
+                  onChangeText={setEventName}
+                  editable={false}
                 />
               </View>
-            )}
-            {selectedDate && (
               <View style={styles.formGroup}>
-                <Text
-                  style={{
-                    color: "white",
-                    marginTop: 10,
-                    alignSelf: "center",
-                    fontSize: 16,
-                  }}
-                >
-                  SELECTED DATE:
-                </Text>
-                <Text
-                  style={{
-                    color: "white",
-                    marginTop: 10,
-                    alignSelf: "center",
-                    backgroundColor: "gray",
-                    padding: 8,
-                    fontSize: 20,
-                    fontWeight: "bold",
-                  }}
-                >
-                  {selectedDate}
-                </Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Register Status"
+                  value={registerStatus}
+                  onChangeText={setRegisterStatus}
+                />
               </View>
-            )}
-          </View>
-          <View style={styles.formGroup}>
-            <View style={styles.budgetContainer}>
-              <Text style={styles.budgetText}>SELECT BUDGET PRICE RANGE:</Text>
-              <View style={styles.budgetPrices}>
-                <Text style={styles.budgetPrice}>
-                  {formatNumber(sliderValues[0])}
-                </Text>
-                <View style={styles.budgetArrowContainer}>
-                  <Icon name="long-arrow-right" size={20} color="#fff" />
-                </View>
-                <Text style={styles.budgetPrice}>
-                  {formatNumber(sliderValues[1])}
-                </Text>
+              <View style={styles.formGroup}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Register Code"
+                  value={registerCode}
+                  onChangeText={setRegisterCode}
+                  keyboardType="numeric"
+                />
               </View>
-            </View>
-            <Slider
-              style={styles.slider}
-              minimumValue={50000}
-              maximumValue={1000000}
-              step={50000}
-              value={sliderValues[0]}
-              onValueChange={(value) =>
-                handleSliderValueChange([value, sliderValues[1]])
-              }
-              thumbTintColor="#e6b800"
-              minimumTrackTintColor="#e6b800"
-              maximumTrackTintColor="#777"
-            />
-            <Slider
-              style={styles.slider}
-              minimumValue={50000}
-              maximumValue={1000000}
-              step={50000}
-              value={sliderValues[1]}
-              onValueChange={(value) =>
-                handleSliderValueChange([sliderValues[0], value])
-              }
-              thumbTintColor="#e6b800"
-              minimumTrackTintColor="#e6b800"
-              maximumTrackTintColor="#777"
-            />
-          </View>
-          <TouchableOpacity style={styles.bookButton} onPress={saveEvent}>
-            <Text style={styles.bookButtonText}>Book Event</Text>
-          </TouchableOpacity>
+              <View style={styles.formGroup}>
+                <TouchableOpacity
+                  style={styles.calendarButton}
+                  onPress={toggleCalendar}
+                >
+                  <Text style={styles.calendarButtonText}>
+                    Choose from calendar (EVENT DATE)
+                  </Text>
+                </TouchableOpacity>
+                {isCalendarVisible && (
+                  <View style={styles.calendarContainer}>
+                    <Calendar
+                      onDayPress={handleDateChange}
+                      markedDates={{
+                        [selectedDate]: {
+                          selected: true,
+                          marked: true,
+                          selectedColor: "#e6b800",
+                        },
+                      }}
+                      theme={{
+                        backgroundColor: "#23232e",
+                        calendarBackground: "#23232e",
+                        textSectionTitleColor: "#cdb6c1",
+                        selectedDayBackgroundColor: "#e6b800",
+                        selectedDayTextColor: "#23232e",
+                        todayTextColor: "#e6b800",
+                        dayTextColor: "#fff",
+                        textDisabledColor: "#424242",
+                        dotColor: "#e6b800",
+                        selectedDotColor: "#23232e",
+                        arrowColor: "#e6b800",
+                      }}
+                    />
+                  </View>
+                )}
+                {selectedDate && (
+                  <View style={styles.formGroup}>
+                    <Text
+                      style={{
+                        color: "white",
+                        marginTop: 10,
+                        alignSelf: "center",
+                        fontSize: 16,
+                      }}
+                    >
+                      SELECTED DATE:
+                    </Text>
+                    <Text
+                      style={{
+                        color: "white",
+                        marginTop: 10,
+                        alignSelf: "center",
+                        backgroundColor: "gray",
+                        padding: 8,
+                        fontSize: 20,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {selectedDate}
+                    </Text>
+                  </View>
+                )}
+              </View>
+              <TouchableOpacity style={styles.bookButton} onPress={saveEvent}>
+                <Text style={styles.bookButtonText}>Book Event</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </KeyboardAvoidingView>
         </ScrollView>
-      </KeyboardAvoidingView>
-    </ImageBackground>
+      </ImageBackground>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   eventCreationPage: {
+    flex: 1,
     backgroundColor: "black",
   },
   goBackButton: {
@@ -377,31 +256,6 @@ const styles = StyleSheet.create({
     color: "#FFC42B",
     fontSize: 24,
     fontWeight: "bold",
-  },
-  eventTypeContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
-  eventTypeButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 30,
-    borderWidth: 1,
-    borderColor: "#FFC42B",
-    marginHorizontal: 3,
-  },
-  eventTypeButtonContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-  },
-  selectedEventTypeButton: {
-    backgroundColor: "#FFC42B",
-  },
-  eventTypeText: {
-    color: "#fff",
-    fontSize: 16,
   },
   formGroup: {
     marginBottom: 20,
@@ -424,38 +278,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-  budgetText: {
-    color: "#fff",
-    fontSize: 16,
-    alignItems: "center",
-  },
-  budgetContainer: {
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  budgetPrices: {
-    alignItems: "center",
-    color: "#fff",
-    fontSize: 16,
+  calendarContainer: {
     marginTop: 10,
-  },
-  budgetPrice: {
-    color: "white",
-    marginHorizontal: 8,
-    fontSize: 16,
-    alignItems: "center",
-  },
-  budgetArrowContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  sliderContainer: {
-    width: "100%",
-    justifyContent: "center",
-  },
-  slider: {
-    width: "100%",
-    height: 40,
   },
   bookButton: {
     backgroundColor: "#FFC42B",

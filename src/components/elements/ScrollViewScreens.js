@@ -1,63 +1,61 @@
-import { View, Text, ScrollView, StyleSheet,Image, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, Alert } from "react-native";
+import { useFocusEffect } from '@react-navigation/native';
+import { getEvents } from '../../services/organizer/organizerServices'; // Adjust the import path as needed
+import renderImage from '../../services/organizer/renderImage';
 
-export default function ScrollViewScreens() {
+const ScrollViewScreens = () => {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchEvents();
+    }, [])
+  );
+
+  const fetchEvents = async () => {
+    try {
+      const eventsData = await getEvents();
+      setEvents(eventsData);
+      setLoading(false);
+    } catch (error) {
+      console.error('Fetch events error:', error);
+      Alert.alert('Error', 'Failed to fetch events');
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
     <ScrollView horizontal style={styles.eventsContainer}>
       {events.map((event, index) => (
         <View key={index} style={styles.eventCard}>
           <View style={styles.eventImageContainer}>
-            <Image source={event.image} style={styles.eventImage} />
-            <TouchableOpacity style={styles.addEventButton}>
-              <Text style={styles.addEventButtonText}>+</Text>
-            </TouchableOpacity>
+            <Image source={{ uri: `${renderImage}/${event.event_image}` }} style={styles.eventImage} />
           </View>
-          <Text style={styles.eventTitle}>{event.title}</Text>
-          <Text style={styles.eventDate}>{event.date}</Text>
-          <Text style={styles.eventLocation}>{event.location}</Text>
+          <Text style={styles.eventTitle}>{event.event_name}</Text>
+          <Text style={styles.eventDate}>{event.event_date}</Text>
+          <Text style={styles.eventLocation}>{event.event_location}</Text>
         </View>
       ))}
     </ScrollView>
   );
 }
-const events = [
-  {
-    image: require("../../../assets/participants_images/wedding.jpg"),
-    title: "Mr. & Mrs. Malik Wedding",
-    date: "23 Sept, 23",
-    location: "Cagayan de Oro City",
-  },
-  {
-    image: require("../../../assets/participants_images/bday.jpg"),
-    title: "Barbella's Birthday",
-    date: "12 August, 23",
-    location: "Cagayan de Oro City",
-  },
-  {
-    image: require("../../../assets/participants_images/reunion.jpg"),
-    title: "Class of 1979 Reunion",
-    date: "25-27 July, 23",
-    location: "Cagayan de Oro City",
-  },
-  {
-    image: require("../../../assets/participants_images/debut.jpg"),
-    title: "Barbella's Debut",
-    date: "23 Sept, 25",
-    location: "Cagayan de Oro City",
-  },
-  {
-    image: require("../../../assets/participants_images/kids.png"),
-    title: "Kids Party",
-    date: "12 August, 24",
-    location: "Cagayan de Oro City",
-  },
-];
-
 
 const styles = StyleSheet.create({
-  viewAllText: {
-    fontSize: 14,
-    color: "#FFC700",
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#000',
   },
   eventsContainer: {
     flexDirection: "row",
@@ -81,21 +79,6 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 10,
     marginBottom: 10,
-  },
-  addEventButton: {
-    position: "absolute",
-    top: 5,
-    right: 5,
-    backgroundColor: "#FFC700",
-    borderRadius: 50,
-    width: 30,
-    height: 30,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  addEventButtonText: {
-    color: "#000",
-    fontSize: 18,
   },
   eventTitle: {
     fontSize: 15,
@@ -162,7 +145,10 @@ const styles = StyleSheet.create({
   },
   screenContainer: {
     flex: 1,
-    // Other styles for your screen container
   },
-  margintop: { marginTop: 160 },
+  margintop: { 
+    marginTop: 160 
+  },
 });
+
+export default ScrollViewScreens;

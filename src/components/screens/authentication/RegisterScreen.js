@@ -218,6 +218,7 @@ const RegisterScreen = () => {
                 <Button
                   onPress={() => setShowDatePicker(true)}
                   mode="outlined"
+<<<<<<< HEAD
                   style={styles.datePickerButton}
                   labelStyle={{ color: "#000" }}
                 >
@@ -232,6 +233,23 @@ const RegisterScreen = () => {
                     maximumDate={new Date()}
                   />
                 )}
+=======
+                  label="Date of Birth"
+                  placeholder="YYYY-MM-DD"
+                  error={isError}
+                  value={date_of_birth}
+                  onChangeText={(text) => setDateOfBirth(text)}
+                  theme={{
+                    colors: {
+                      primary: "#FFC42B",
+                      text: "#000",
+                      placeholder: "#FFC42B",
+                      background: "#fff",
+                    },
+                  }}
+                  left={<TextInput.Icon icon={() => <CustomIcon name="calendar" size={24} color="black" />} />}
+                />
+>>>>>>> 8692045e8da68b0b06533d82d56a9d6293ca1f90
                 <TextInput
                   style={styles.inputStyle}
                   mode="outlined"

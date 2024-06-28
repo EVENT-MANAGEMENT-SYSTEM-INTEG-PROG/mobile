@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { LogBox, View, ActivityIndicator } from "react-native";
 //Stacks
@@ -40,12 +39,6 @@ import ViewSched from '../components/screens/organizer/viewsched';
 import EventsScreen from '../components/screens/participants/EventsScreen';
 import CalendarScreen from '../components/screens/participants/CalendarScreen';
 import JoinedEventsScreen from '../components/screens/participants/JoinedEventsScreen';
-import BirthdayScreen from '../components/screens/participants/BirthdayScreen';
-import SummitScreen from '../components/screens/participants/SummitScreen';
-import ReunionScreen from '../components/screens/participants/ReunionScreen';
-import ConcertScreen from '../components/screens/participants/ConcertScreen';
-import FestivalScreen from '../components/screens/participants/FestivalScreen';
-import WeddingScreen from '../components/screens/participants/WeddingScreen';
 import SelectedEventScreen from '../components/screens/participants/SelectedEventScreen';
 import FeedbackScreen from '../components/screens/participants/FeedbackScreen';
 import BookEventScreen from '../components/screens/participants/BookEventScreen';
@@ -137,14 +130,6 @@ function EventsTab() {
         <Stack.Screen name="EventsStack" component={EventsScreen} />
         <Stack.Screen name="Calendar" component={CalendarScreen} />
         <Stack.Screen name="JoinedEvents" component={JoinedEventsScreen} />
-  
-        {/* 6 event types */}
-        <Stack.Screen name="Birthday" component={BirthdayScreen} />
-        <Stack.Screen name="Summit" component={SummitScreen} />
-        <Stack.Screen name="Reunion" component={ReunionScreen} />
-        <Stack.Screen name="Concert" component={ConcertScreen} />
-        <Stack.Screen name="Festival" component={FestivalScreen} />
-        <Stack.Screen name="Wedding" component={WeddingScreen} />
   
         {/* selected event screen */}
         <Stack.Screen name="SelectedEvent" component={SelectedEventScreen} />

@@ -1,66 +1,67 @@
-import React from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import React, { useState, useEffect } from "react";
+import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { getEvents } from '../../services/organizer/organizerServices'; // Adjust the import path as needed
+import renderImage from '../../services/organizer/renderImage';
 
-const festivals = [
-  {
-    name: "Angela's Birthday",
-    date: "11 Aug 2024",
-    image: require("../../../assets/participants_images/bday.jpg"),
-  },
-  {
-    name: "Angelo's Birthday",
-    date: "12 Aug 2024",
-    image: require("../../../assets/participants_images/bday.jpg"),
-  },
-  {
-    name: "Angeline's Birthday",
-    date: "13 Aug 2024",
-    image: require("../../../assets/participants_images/bday.jpg"),
-  },
-  {
-    name: "Angelita's Birthday",
-    date: "18 Aug 2024",
-    image: require("../../../assets/participants_images/bday.jpg"),
-  },
-  {
-    name: "Angelito's Birthday",
-    date: "21 Aug 2024",
-    image: require("../../../assets/participants_images/bday.jpg"),
-  },
-  {
-    name: "Angel's Birthday",
-    date: "10 Aug 2024",
-    image: require("../../../assets/participants_images/bday.jpg"),
-  },
-];
-
-const FestivalCard = ({ name, date, image }) => {
+const FestivalCard = ({ name, date, location, description, image, event_id }) => {
   const navigation = useNavigation();
 
   const handleCardPress = () => {
-    // Navigate to the selected event screen with props
-    navigation.navigate("SelectedEvent", { name, date, image });
+    navigation.navigate("SelectedEvent", { name, date, location, description, image, event_id });
   };
 
   return (
     <TouchableOpacity style={styles.card} onPress={handleCardPress}>
-      <Image source={image} style={styles.image} />
+      <Image source={{ uri: image }} style={styles.image} />
       <Text style={styles.title}>{name}</Text>
       <Text style={styles.date}>{date}</Text>
+      <Text style={styles.location}>{location}</Text>
     </TouchableOpacity>
   );
 };
 
 const Cards = () => {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchEvents();
+    }, [])
+  );
+
+  const fetchEvents = async () => {
+    try {
+      const eventsData = await getEvents();
+      setEvents(eventsData);
+      setLoading(false);
+    } catch (error) {
+      console.error('Fetch events error:', error);
+      Alert.alert('Error', 'Failed to fetch events');
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      {festivals.map((festival) => (
+      {events.map((event) => (
         <FestivalCard
-          key={festival.name}
-          name={festival.name}
-          date={festival.date}
-          image={festival.image}
+          key={event.event_id}
+          name={event.event_name}
+          date={event.event_date}
+          location={event.event_location}
+          description={event.event_description}
+          image={`${renderImage}/${event.event_image}`}
+          event_id={event.event_id}
         />
       ))}
     </View>
@@ -68,19 +69,27 @@ const Cards = () => {
 };
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
   container: {
     flex: 1,
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
     alignItems: "center",
     padding: 16,
   },
   card: {
     width: "45%",
-    height: 170,
+    height: 220,
     marginBottom: 25,
-
     borderRadius: 8,
     overflow: "hidden",
     backgroundColor: "white",
@@ -93,9 +102,6 @@ const styles = StyleSheet.create({
     height: "70%",
     resizeMode: "cover",
   },
-  cardContent: {
-    padding: 12,
-  },
   title: {
     fontSize: 15,
     fontWeight: "bold",
@@ -106,6 +112,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#888",
   },
+  location: {
+    fontSize: 13,
+    color: "#888",
+  }
 });
 
 export default Cards;

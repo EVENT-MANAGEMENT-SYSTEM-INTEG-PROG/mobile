@@ -1,5 +1,3 @@
-// SelectedEventScreen.js
-
 import React from "react";
 import {
   View,
@@ -14,7 +12,7 @@ import CustomHeader from "../../elements/CustomHeader";
 import { useNavigation } from "@react-navigation/native";
 
 const SelectedEventScreen = ({ route }) => {
-  const { name, date, image } = route.params;
+  const { name, date, description, image } = route.params;
   const navigation = useNavigation();
 
   const handleJoinPress = () => {
@@ -32,7 +30,7 @@ const SelectedEventScreen = ({ route }) => {
         onBackPress={() => navigation.goBack()}
       />
       <ScrollView contentContainerStyle={styles.container}>
-        <Image source={image} style={styles.image} />
+        <Image source={{ uri: image }} style={styles.image} />
         <View style={styles.buttonContainer}>
           <TouchableOpacity onPress={handleJoinPress} style={styles.button}>
             <Text style={styles.buttonText}>Join Event</Text>
@@ -48,14 +46,7 @@ const SelectedEventScreen = ({ route }) => {
         <Text style={styles.date}>{date}</Text>
         <View style={styles.detailsContainer}>
           <Text style={styles.detailsTitle}>DETAILS</Text>
-          <Text style={styles.detailsText}>
-            Lorem ipsum dolor sit amet. Vel dignissimos reiciendis ab
-            voluptatibus dolorem eum voluptas sint et repellat animi aut
-            voluptatem sunt. Qui ipsam rerum non quae quia aut quasi
-            voluptatibus est quia exercitationem est dicta quibusdam. Ut quos
-            quam At sint tenetur in voluptatum doloremque ad iusto distinctio ex
-            voluptates magnam et necessitatibus quaerat.
-          </Text>
+          <Text style={styles.detailsText}>{description}</Text>
         </View>
       </ScrollView>
     </ImageBackground>
