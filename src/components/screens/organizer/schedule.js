@@ -1,10 +1,20 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  ActivityIndicator,
+  Modal,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
 import Swiper from 'react-native-swiper';
+import RNPickerSelect from 'react-native-picker-select';
 import NavBar from './nav';
+import { fetchSchedule, getEvents, createSchedule } from '../../../services/organizer/organizerServices';
 
 const { width } = Dimensions.get('window');
 
@@ -13,6 +23,40 @@ const Schedule = () => {
   const swiper = useRef(null);
   const [value, setValue] = useState(new Date());
   const [week, setWeek] = useState(0);
+  const [scheduleData, setScheduleData] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+
+  useEffect(() => {
+    const loadSchedule = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchSchedule(value);
+        setScheduleData(data);
+      } catch (error) {
+        console.error('Error fetching schedule:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSchedule();
+  }, [value]);
+
+  useEffect(() => {
+    const loadEvents = async () => {
+      try {
+        const eventsData = await getEvents();
+        setEvents(eventsData);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      }
+    };
+
+    loadEvents();
+  }, []);
 
   const weeks = React.useMemo(() => {
     const start = moment().add(week, 'weeks').startOf('week');
@@ -33,6 +77,22 @@ const Schedule = () => {
     navigation.navigate(tabName);
   };
 
+  const handleCreateSchedule = async () => {
+    try {
+      if (selectedEvent && value) {
+        await createSchedule({ eventId: selectedEvent, scheduleDate: value });
+        setModalVisible(false);
+        setSelectedEvent(null);
+        const data = await fetchSchedule(value);
+        setScheduleData(data);
+      } else {
+        alert('Please select a date and event.');
+      }
+    } catch (error) {
+      console.error('Error creating schedule:', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => navigation.openDrawer()} style={styles.menuButton}>
@@ -40,7 +100,7 @@ const Schedule = () => {
       </TouchableOpacity>
 
       <View style={styles.header}>
-        <Text style={styles.title}>Create Schedule</Text>
+        <Text style={styles.title}>Schedule</Text>
       </View>
 
       <View style={styles.picker}>
@@ -62,12 +122,12 @@ const Schedule = () => {
             }, 100);
           }}>
           {weeks.map((dates, index) => (
-            <View style={styles.itemRow} key={index}>
+            <View style={styles.itemRow} key={`week-${index}`}>
               {dates.map((item, dateIndex) => {
                 const isActive = value.toDateString() === item.date.toDateString();
                 return (
                   <TouchableOpacity
-                    key={dateIndex}
+                    key={`date-${dateIndex}`}
                     onPress={() => setValue(item.date)}
                     style={[
                       styles.item,
@@ -90,23 +150,68 @@ const Schedule = () => {
         </Swiper>
       </View>
 
-      <View style={{ flex: 1, paddingHorizontal: 16, paddingVertical: 24, marginBottom: 25 }}>
+      <View style={{ flex: 1, paddingHorizontal: 16, paddingVertical: 24 }}>
         <Text style={styles.subtitle}>{value.toDateString()}</Text>
-        <View style={styles.placeholder}>
-          <View style={styles.placeholderInset}>
+        {loading ? (
+          <ActivityIndicator size="large" color="#fff" />
+        ) : (
+          <View style={styles.placeholder}>
+            {scheduleData.length > 0 ? (
+              scheduleData.map((item) => (
+                <View key={item.event.id} style={styles.scheduleItemContainer}>
+                  <Text style={styles.eventName}>{item.event.event_name}</Text>
+                  <Text style={styles.scheduleDetails}>{moment(item.schedule_date).format('YYYY-MM-DD')}   {item.event.event_time}</Text>
+                  
+                </View>
+              ))
+            ) : (
+              <>
+                <Text style={styles.noScheduleText}>No schedule available</Text>
+                <TouchableOpacity onPress={() => setModalVisible(true)}>
+                  <View style={styles.createBtn}>
+                    <Text style={styles.btnText}>Create Schedule</Text>
+                  </View>
+                </TouchableOpacity>
+              </>
+            )}
           </View>
-          
-        </View>
+        )}
         <View style={styles.footer}>
-        <TouchableOpacity onPress={() => handleTabPress('ViewSched')}>
-          <View style={styles.btn}>
-            <Text style={styles.btnText}>Submit</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity onPress={() => handleTabPress('ViewSched')}>
+            <View style={styles.btn}>
+              <Text style={styles.btnText}>View Full Calendar</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      
+      <Modal visible={modalVisible} animationType="slide" transparent={true}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Create Schedule</Text>
+            <RNPickerSelect
+              onValueChange={(value) => setSelectedEvent(value)}
+              items={events.map(event => ({ label: event.event_name, value: event.event_id }))}
+              placeholder={{ label: 'Select an event...', value: null }}
+              style={pickerSelectStyles}
+            />
+            {/* Display selected date */}
+            <Text style={styles.scheduleDateLabel}>Schedule Date:</Text>
+            <Text style={styles.scheduleDate}>{moment(value).format('YYYY-MM-DD')}</Text>
+            <TouchableOpacity onPress={handleCreateSchedule}>
+              <View style={styles.modalBtn}>
+                <Text style={styles.btnText}>Create</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setModalVisible(false)}>
+              <View style={[styles.modalBtn, styles.cancelBtn]}>
+                <Text style={styles.btnText}>Cancel</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       <NavBar />
     </View>
   );
@@ -185,14 +290,21 @@ const styles = StyleSheet.create({
     padding: 0,
     backgroundColor: 'transparent',
   },
-  placeholderInset: {
-    borderWidth: 4,
-    borderColor: '#e5e7eb',
-    borderStyle: 'dashed',
-    borderRadius: 9,
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 0,
+  scheduleItemContainer: {
+    marginBottom: 10,
+  },
+  eventName: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  scheduleDetails: {
+    color: '#999',
+    fontSize: 14,
+  },
+  noScheduleText: {
+    color: '#999',
+    fontSize: 16,
   },
   btn: {
     flexDirection: 'row',
@@ -206,6 +318,18 @@ const styles = StyleSheet.create({
     borderColor: '#FFC42B',
     marginTop: 10,
   },
+  createBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderWidth: 1,
+    backgroundColor: '#FFC42B',
+    borderColor: '#FFC42B',
+    marginTop: 20,
+  },
   btnText: {
     fontSize: 18,
     lineHeight: 26,
@@ -217,6 +341,79 @@ const styles = StyleSheet.create({
     top: 40,
     left: 20,
     zIndex: 1,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  modalBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderWidth: 1,
+    backgroundColor: '#FFC42B',
+    borderColor: '#FFC42B',
+    marginTop: 10,
+  },
+  cancelBtn: {
+    backgroundColor: '#888',
+    borderColor: '#888',
+  },
+  scheduleDateLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginTop: 15,
+  },
+  scheduleDate: {
+    fontSize: 16,
+    fontWeight: '400',
+    color: '#555',
+    marginTop: 5,
+  },
+});
+
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 4,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+    width: '100%',
+    marginBottom: 10,
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: 'purple',
+    borderRadius: 8,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+    width: '100%',
+    marginBottom: 10,
   },
 });
 
