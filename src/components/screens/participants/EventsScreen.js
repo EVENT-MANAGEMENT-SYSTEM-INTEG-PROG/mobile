@@ -73,7 +73,7 @@ export default function EventsScreen() {
         />
         <CarouselView />
         <Text style={styles.title}>EVENTS</Text>
-          <Cards />
+        <Cards searchQuery={searchQuery} />
         <View style={styles.marginbottom}></View>
       </ScrollView>
     </ImageBackground>

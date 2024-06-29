@@ -21,7 +21,7 @@ const FestivalCard = ({ name, date, location, description, image, event_id }) =>
   );
 };
 
-const Cards = () => {
+const Cards = ({ searchQuery }) => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -43,6 +43,10 @@ const Cards = () => {
     }
   };
 
+  const filteredEvents = events.filter(event =>
+    event.event_name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -53,7 +57,7 @@ const Cards = () => {
 
   return (
     <View style={styles.container}>
-      {events.map((event) => (
+      {filteredEvents.map((event) => (
         <FestivalCard
           key={event.event_id}
           name={event.event_name}
