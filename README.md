@@ -11,9 +11,6 @@ git clone https://github.com/EVENT-MANAGEMENT-SYSTEM-INTEG-PROG/mobile.git
 # Go the the Directory
 cd mobile
 
-# Switch the branch
-git checkout mobile
-
 # Open the IDE
 code .
 
