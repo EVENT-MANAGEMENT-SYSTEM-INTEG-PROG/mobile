@@ -1,6 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import API_URL from '../../constants/constants';
+import moment from 'moment';
 
 const api = axios.create({
     baseURL: `${API_URL}/api`,
@@ -86,3 +87,43 @@ export const checkConflict = async (eventData) => {
         throw error;
     }
 };
+
+export const createSchedule = async (scheduleData) => {
+    try {
+        // Format the scheduleDate to MySQL compatible format (YYYY-MM-DD)
+        const formattedScheduleData = {
+            ...scheduleData,
+            scheduleDate: moment(scheduleData.scheduleDate).format('YYYY-MM-DD')
+        };
+        const response = await api.post('/schedule/create', formattedScheduleData);
+        return response.data;
+    } catch (error) {
+        console.error('Error creating schedule:', error);
+        throw error;
+    }
+};
+  
+
+export const fetchSchedule = async (date) => {
+    try {
+        const response = await api.get('/schedule/search', {
+            params: { date: moment(date).format('YYYY-MM-DD') }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching schedule:', error);
+        throw error;
+    }
+};
+
+
+export const fetchSchedules = async () => {
+    try {
+        const response = await api.get('/schedule');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching schedule:', error);
+        throw error;
+    }
+};
+
