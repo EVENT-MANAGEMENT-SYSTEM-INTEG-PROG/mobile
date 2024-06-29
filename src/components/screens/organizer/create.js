@@ -11,27 +11,30 @@ import {
   Image,
   ScrollView,
   Platform,
-  ActivityIndicator, // Import ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons'; // Import AntDesign icon
 import { Provider as PaperProvider } from 'react-native-paper';
 import NavBar from './nav';
-import { createEvent } from '../../../services/organizer/organizerServices'; // Adjust the import path as needed
+import { createEvent } from '../../../services/organizer/organizerServices';
 import { getUser } from '../../../services/authentication/authServices';
-import * as ImagePicker from 'expo-image-picker'; // Import expo-image-picker
-import * as FileSystem from 'expo-file-system'; // Import expo-file-system
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 import { useFocusEffect } from '@react-navigation/native';
+import RNPickerSelect from 'react-native-picker-select';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const Create = ({ navigation }) => {
   const [eventName, setEventName] = useState('');
   const [eventDescription, setEventDescription] = useState('');
-  const [eventDate, setEventDate] = useState('');
+  const [eventDate, setEventDate] = useState(null);
   const [eventTime, setEventTime] = useState('');
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [eventLocation, setEventLocation] = useState('');
   const [organizer, setOrganizer] = useState('');
   const [participants, setParticipants] = useState('');
-  const [eventImage, setEventImage] = useState(null); // State for storing the selected image URI
-  const [isLoading, setIsLoading] = useState(false); // State for loading indicator
+  const [eventImage, setEventImage] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -51,7 +54,7 @@ const Create = ({ navigation }) => {
 
   const handleCreateEvent = async () => {
     try {
-      setIsLoading(true); // Start loading indicator
+      setIsLoading(true);
 
       const participantsArray = participants.split(',').map(email => email.trim());
       let base64Image = null;
@@ -65,7 +68,7 @@ const Create = ({ navigation }) => {
       const eventData = {
         event_name: eventName,
         event_description: eventDescription,
-        event_date: eventDate,
+        event_date: eventDate ? eventDate.toISOString().split('T')[0] : null,
         event_time: eventTime,
         event_location: eventLocation,
         event_status: 'Upcoming',
@@ -75,14 +78,14 @@ const Create = ({ navigation }) => {
       };
 
       await createEvent(eventData);
-      setIsLoading(false); // Stop loading indicator on success
+      setIsLoading(false);
       Alert.alert('Success', 'Event created successfully', [
         { text: 'OK', onPress: () => navigation.goBack() }
       ]);
       resetForm();
     } catch (error) {
       console.error('Event creation error:', error);
-      setIsLoading(false); // Stop loading indicator on error
+      setIsLoading(false);
       Alert.alert('Error', 'Failed to create event');
     }
   };
@@ -90,11 +93,11 @@ const Create = ({ navigation }) => {
   const resetForm = () => {
     setEventName("");
     setEventDescription("");
-    setEventDate("");
+    setEventDate(null);
     setEventTime("");
     setEventLocation("");
     setParticipants("");
-    setEventImage(null); // Reset image state
+    setEventImage(null);
   };
 
   const handleImageUpload = async () => {
@@ -113,7 +116,7 @@ const Create = ({ navigation }) => {
       });
 
       if (!pickerResult.cancelled) {
-        setEventImage({ uri: pickerResult.assets[0].uri }); // Use pickerResult.assets[0].uri
+        setEventImage({ uri: pickerResult.assets[0].uri });
       }
     } catch (error) {
       console.error('ImagePicker Error:', error);
@@ -121,16 +124,21 @@ const Create = ({ navigation }) => {
     }
   };
 
+  const handleDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || eventDate || new Date();
+    setShowDatePicker(Platform.OS === 'ios');
+    setEventDate(currentDate);
+  };
+
   return (
     <PaperProvider>
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0} // Adjust this value if necessary
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
       >
-        {/* Burger icon to open sidebar */}
-        <TouchableOpacity onPress={() => navigation.openDrawer()} style={styles.menuButton}>
-          <Ionicons name="menu" size={32} color="white" />
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.menuButton}>
+          <AntDesign name="arrowleft" size={32} color="white" />
         </TouchableOpacity>
 
         <ScrollView style={{ marginTop: 15, marginBottom: 60 }}>
@@ -139,18 +147,24 @@ const Create = ({ navigation }) => {
               <ActivityIndicator size="large" color="#FFC42B" />
             </View>
           )}
-          
+
           <View style={styles.formContainer}>
             <Text style={styles.label}>Event Name</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter Event Name"
-              placeholderTextColor="#888"
+            <RNPickerSelect
+              onValueChange={(value) => setEventName(value)}
+              items={[
+                { label: 'Birthday', value: 'Birthday' },
+                { label: 'Summit', value: 'Summit' },
+                { label: 'Reunion', value: 'Reunion' },
+                { label: 'Concert', value: 'Concert' },
+                { label: 'Festival', value: 'Festival' },
+                { label: 'Wedding', value: 'Wedding' },
+              ]}
+              style={pickerSelectStyles}
+              placeholder={{ label: "Select an event type...", value: null }}
               value={eventName}
-              onChangeText={setEventName}
             />
 
-            {/* Add image upload */}
             <TouchableOpacity onPress={handleImageUpload} style={styles.imagePicker}>
               {eventImage ? (
                 <Image source={{ uri: eventImage.uri }} style={styles.eventImage} />
@@ -168,14 +182,23 @@ const Create = ({ navigation }) => {
               onChangeText={setEventDescription}
             />
 
-            <Text style={styles.label}>Event Date</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor="#888"
-              value={eventDate}
-              onChangeText={setEventDate}
-            />
+            <View style={styles.datePickerContainer}>
+              <Text style={styles.label}>Event Date</Text>
+              <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.datePicker}>
+                <Text style={styles.datePickerText}>
+                  {eventDate ? eventDate.toISOString().split('T')[0] : "Pick a date"}
+                </Text>
+                <AntDesign name="calendar" size={24} color="white" style={{ marginLeft: 10 }} />
+              </TouchableOpacity>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={eventDate || new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={handleDateChange}
+                />
+              )}
+            </View>
 
             <Text style={styles.label}>Event Time</Text>
             <TextInput
@@ -202,7 +225,7 @@ const Create = ({ navigation }) => {
               placeholderTextColor="#888"
               value={organizer}
               onChangeText={setOrganizer}
-              editable={false} // Prevent editing if needed
+              editable={false}
             />
 
             <Text style={styles.label}>Participants (comma-separated emails)</Text>
@@ -272,6 +295,23 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
   },
+  datePickerContainer: {
+    marginBottom: 10,
+  },
+  datePicker: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#333',
+    borderRadius: 5,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginBottom: 10,
+  },
+  datePickerText: {
+    color: '#FFF',
+    fontSize: 14,
+    flex: 1,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -283,6 +323,33 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1,
+  },
+});
+
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: '#333',
+    borderRadius: 5,
+    color: '#FFF',
+    paddingRight: 30,
+    marginBottom: 10,
+    backgroundColor: '#333',
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: '#333',
+    borderRadius: 5,
+    color: '#FFF',
+    paddingRight: 30,
+    marginBottom: 10,
+    backgroundColor: '#333',
   },
 });
 

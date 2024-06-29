@@ -8,14 +8,10 @@ import {
   Image,
   ImageBackground,
   TouchableOpacity,
-  onChangeSearch,
-  searchQuery,
   BackHandler
 } from "react-native";
 import CustomHeader from "../../elements/CustomHeader";
-import { Searchbar } from "react-native-paper";
 import Scrollview from "../../elements/ScrollViewScreens";
-import { getEvents } from "../../../services/organizer/organizerServices";
 import { getUser } from '../../../services/authentication/authServices';
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -73,12 +69,6 @@ export default function HomeScreen({ navigation }) {
           </View>
           <Text style={styles.locationText}>{country}</Text>
         </View>
-        <Searchbar
-          placeholder="Search Events"
-          onChangeText={onChangeSearch}
-          value={searchQuery}
-          style={styles.searchBar}
-        />
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Popular Events</Text>
           <TouchableOpacity>

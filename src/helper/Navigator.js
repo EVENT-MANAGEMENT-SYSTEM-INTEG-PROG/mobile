@@ -25,7 +25,7 @@ import Budget from '../components/screens/organizer/budget';
 import Inventory from '../components/screens/organizer/inventory';
 import Attendees from '../components/screens/organizer/attendee';
 import Dashboard from '../components/screens/organizer/dashboard';
-import Event from '../components/screens/organizer/event';
+import Participant from '../components/screens/organizer/participants';
 import Services from '../components/screens/organizer/services';
 import Schedule from '../components/screens/organizer/schedule';
 import About from '../components/screens/organizer/about';
@@ -107,7 +107,7 @@ function OrganizerStack() {
             <Drawer.Screen name="Feedback" component={Feedback} options={{ headerShown: false }} />
             <Drawer.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
             
-            <Drawer.Screen name="Event" component={Event} options={{ headerShown: false }} />
+            <Drawer.Screen name="Participant" component={Participant} options={{ headerShown: false }} />
             <Drawer.Screen name="Services" component={Services} options={{ headerShown: false }} />
             <Drawer.Screen name="Schedule" component={Schedule} options={{ headerShown: false }} />
             <Drawer.Screen name="About" component={About} options={{ headerShown: false }} />

@@ -1,4 +1,4 @@
-// src/services/participantServices.js
+// src/services/evaluationServices.js
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import API_URL from '../../constants/constants';
@@ -19,51 +19,51 @@ api.interceptors.request.use(async config => {
     return config;
 });
 
-export const getRegistration = async () => {
+export const getEvaluations = async () => {
     try {
-        const response = await api.get('/registration');
+        const response = await api.get('/evaluation');
         return response.data;
     } catch (error) {
-        console.error('Get participants error:', error);
+        console.error('Get evaluations error:', error);
         throw error;
     }
 };
 
-export const getRegistrationById = async (id) => {
+export const getEvaluationById = async (id) => {
     try {
-        const response = await api.get(`/registration/${id}`);
+        const response = await api.get(`/evaluation/${id}`);
         return response.data;
     } catch (error) {
-        console.error('Get participant by ID error:', error);
+        console.error('Get evaluation by ID error:', error);
         throw error;
     }
 };
 
-export const createRegistration = async (participantData) => {
+export const createEvaluation = async (evaluationData) => {
     try {
-        const response = await api.post('/registration', participantData);
+        const response = await api.post('/evaluation', evaluationData);
         return response.data;
     } catch (error) {
-        console.error('Create participant error:', error);
+        console.error('Create evaluation error:', error);
         throw error;
     }
 };
 
-export const updateRegistration = async (id, participantData) => {
+export const updateEvaluation = async (id, evaluationData) => {
     try {
-        const response = await api.patch(`/registration/${id}`, participantData);
+        const response = await api.patch(`/evaluation/${id}`, evaluationData);
         return response.data;
     } catch (error) {
-        console.error('Update participant error:', error);
+        console.error('Update evaluation error:', error);
         throw error;
     }
 };
 
-export const deleteRegistration = async (id) => {
+export const deleteEvaluation = async (id) => {
     try {
-        await api.delete(`/registration/${id}`);
+        await api.delete(`/evaluation/${id}`);
     } catch (error) {
-        console.error('Delete participant error:', error);
+        console.error('Delete evaluation error:', error);
         throw error;
     }
 };

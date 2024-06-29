@@ -16,7 +16,7 @@ const SelectedEventScreen = ({ route }) => {
   const navigation = useNavigation();
 
   const handleJoinPress = () => {
-    navigation.navigate("BookEvent");
+    navigation.navigate("BookEvent", { eventName: name }); // Pass event name as a parameter
   };
 
   const handleCopyLinkPress = () => {

@@ -10,7 +10,7 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import NavBar from './nav';
 import { getEvents, deleteEvent, updateEvent } from '../../../services/organizer/organizerServices'; // Import deleteEvent and updateEvent functions
@@ -149,8 +149,8 @@ const FindEvent = () => {
   return (
     <>
       <View style={styles.container}>
-        <TouchableOpacity onPress={() => navigation.openDrawer()} style={styles.menuButton}>
-          <Ionicons name="menu" size={32} color="white" />
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.menuButton}>
+          <AntDesign name="arrowleft" size={32} color="white" />
         </TouchableOpacity>
         <View style={styles.searchContainer}>
           <MaterialCommunityIcons name="magnify" size={24} color="#888" style={styles.searchIcon} />
@@ -247,12 +247,6 @@ const FindEvent = () => {
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.modalButton} onPress={handleDeleteEvent}>
                       <Text style={styles.buttonText}>Remove</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.modalButton}
-                      onPress={() => alert('Participant clicked')}
-                    >
-                      <Text style={styles.buttonText}>Participant</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.modalButton}

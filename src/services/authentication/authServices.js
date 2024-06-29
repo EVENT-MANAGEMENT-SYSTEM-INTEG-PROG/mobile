@@ -67,3 +67,14 @@ export const getUser = async () => {
         throw error;
     }
 };
+
+export const getParticipants = async () => {
+    try {
+        const response = await api.get('/user/participants');
+        return response.data;
+    } catch (error) {
+        console.error('Get participants error:', error);
+        throw error;
+    }
+};
+

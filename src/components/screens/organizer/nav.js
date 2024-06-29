@@ -11,7 +11,7 @@ const NavBar = () => {
 
   const tabScreenMapping = {
     Dashboard: 'Dashboard',
-    Event: 'Event',
+    Participant: 'Participant',
     Services: 'Services',
     Schedule: 'Schedule',
     About: 'About',
@@ -38,7 +38,7 @@ const NavBar = () => {
   // Define tabs
   const tabs = [
     { name: 'Dashboard', icon: 'home' },
-    { name: 'Event', icon: 'calendar' },
+    { name: 'Participant', icon: 'person' },
     { name: 'Services', icon: 'construct' },
     { name: 'Schedule', icon: 'time' },
     { name: 'About', icon: 'information-circle' },

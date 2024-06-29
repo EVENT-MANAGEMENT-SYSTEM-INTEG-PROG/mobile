@@ -9,24 +9,37 @@ import FindEvent from './findevent';
 import Create from './create';
 import { getUser } from '../../../services/authentication/authServices';
 import { useFocusEffect } from '@react-navigation/native';
+import { getEvents } from '../../../services/organizer/organizerServices';
+import renderImage from '../../../services/organizer/renderImage';
 
-const Dashboard = ( {navigation} ) => {
+const Dashboard = ({ navigation }) => {
   const [user_name, setUsername] = useState("");
   const [country, setCountry] = useState("");
+  const [events, setEvents] = useState([]); // State to hold events
 
   useFocusEffect(
     React.useCallback(() => {
       fetchUserData();
+      fetchEventsData(); // Fetch events when screen is focused
     }, [])
   );
 
   const fetchUserData = async () => {
     try {
       const userData = await getUser();
-      setUsername(userData.user_name); // Assuming the user object contains a username property
-      setCountry(userData.country); // Assuming the user object contains a location property
+      setUsername(userData.user_name);
+      setCountry(userData.country);
     } catch (error) {
       console.error('Failed to fetch user data:', error);
+    }
+  };
+
+  const fetchEventsData = async () => {
+    try {
+      const fetchedEvents = await getEvents(); // Fetch events from API
+      setEvents(fetchedEvents); // Set events in state
+    } catch (error) {
+      console.error('Failed to fetch events:', error);
     }
   };
 
@@ -39,7 +52,6 @@ const Dashboard = ( {navigation} ) => {
     // Cleanup the event listener when the component unmounts
     return () => backHandler.remove();
   }, []);
-
 
   const handleViewAllPress = (section) => {
     console.log(`View All ${section} clicked`);
@@ -63,29 +75,6 @@ const Dashboard = ( {navigation} ) => {
     });
   };
 
-  const events = [
-    {
-      id: 1,
-      image: require("../../../../assets/organizer_images/event1.png"),
-      title: "Mr. & Mrs. Malik Wedding",
-      date: "23 Sept, 25",
-      location: "Cagayan de Oro City"
-    },
-    {
-      id: 2,
-      image: require("../../../../assets/organizer_images/event2.png"),
-      title: "Barbella’s Birthday",
-      date: "12 August, 23",
-      location: "Cagayan de Oro City"
-    },
-    {
-      id: 3,
-      image: require("../../../../assets/organizer_images/event3.png"),
-      title: "Class of 1979 Reunion",
-      date: "25-27 July, 23",
-      location: "Cagayan de Oro City"
-    }
-  ];
 
   return (
     <PaperProvider>
@@ -139,14 +128,11 @@ const Dashboard = ( {navigation} ) => {
         </View>
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionText}>Popular Events</Text>
-          <TouchableOpacity onPress={() => handleViewAllPress("Popular Events")}>
-            <Text style={styles.viewAllText}>View All</Text>
-          </TouchableOpacity>
         </View>
         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.scrollView}>
           {events.map(event => (
             <View key={event.id} style={styles.eventCard}>
-              <Image source={event.image} style={styles.eventImage} />
+              <Image source={{ uri: `${renderImage}/${event.event_image}` }} style={styles.eventImage} />
               <TouchableOpacity onPress={() => toggleLike(event.id)} style={[styles.heartIcon, likedEvents[event.id] ? styles.heartLiked : null]}>
                 <MaterialCommunityIcons 
                   name={likedEvents[event.id] ? "heart" : "heart-outline"} 
@@ -154,15 +140,15 @@ const Dashboard = ( {navigation} ) => {
                   size={20} 
                 />
               </TouchableOpacity>
-              <Text style={styles.eventTitle}>{event.title}</Text>
+              <Text style={styles.eventTitle}>{event.event_name}</Text>
               <View style={styles.eventDetailRow}>
                 <View style={styles.eventDetailContainer}>
                   <MaterialCommunityIcons name="calendar" color="#2A93D5" size={16} />
-                  <Text style={styles.eventDetailText}>{event.date}</Text>
+                  <Text style={styles.eventDetailText}>{event.event_date}</Text>
                 </View>
                 <View style={styles.eventDetailContainer}>
                   <MaterialCommunityIcons name="map-marker" color="#2A93D5" size={16} />
-                  <Text style={styles.eventDetailText}>{event.location}</Text>
+                  <Text style={styles.eventDetailText}>{event.event_location}</Text>
                 </View>
               </View>
             </View>
@@ -170,9 +156,6 @@ const Dashboard = ( {navigation} ) => {
         </ScrollView>
         <View style={styles.chooseEventContainer}>
           <Text style={styles.sectionTextChooseEvent}>Choose Event</Text>
-          <TouchableOpacity onPress={() => handleViewAllPress("Choose Event")}>
-            <Text style={styles.viewAllText}>View All</Text>
-          </TouchableOpacity>
         </View>
         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.buttonScrollView}>
           {["Wedding", "Birthday", "Reunion", "Debut"].map((buttonLabel, index) => (
