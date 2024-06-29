@@ -88,7 +88,7 @@ const Dashboard = ({ navigation }) => {
         <View style={styles.profileSection}>
           <Avatar.Image
             size={50}
-            source={require("../../../../assets/organizer_images/pro_pic.png")}
+            source={require("../../../../assets/organizer_images/organizer_profle.png")}
             style={styles.profilePicture}
           />
           <View style={styles.welcomeUsername}>
@@ -128,6 +128,9 @@ const Dashboard = ({ navigation }) => {
         </View>
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionText}>Popular Events</Text>
+          <TouchableOpacity onPress={() => navigation.navigate("FindEvent")}>
+            <Text style={styles.viewAllText}>View All</Text>
+          </TouchableOpacity>
         </View>
         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.scrollView}>
           {events.map(event => (
@@ -210,6 +213,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   profilePicture: {
+    backgroundColor: '#000',
     marginRight: 10,
     marginTop: 20,
   },

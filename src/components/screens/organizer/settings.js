@@ -1,18 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // Import Ionicons for the burger icon
-import { useNavigation } from '@react-navigation/native';
 import NavBar from './nav';
 
-const Settings = () => {
-  const navigation = useNavigation(); 
-
-  const [profileSettings, setProfileSettings] = useState({
-    username: 'JohnDoe',
-    email: 'johndoe@example.com',
-    phoneNumber: '123-456-7890',
-    address: '123 Main St, City, Country'
-  });
+const Settings = ({ navigation }) => {
 
   const [systemSettings, setSystemSettings] = useState({
     language: 'English',
@@ -20,12 +11,7 @@ const Settings = () => {
     timeZone: 'UTC'
   });
 
-  const [editingProfile, setEditingProfile] = useState(false);
   const [editingSystem, setEditingSystem] = useState(false);
-
-  const handleSaveProfile = () => {
-    setEditingProfile(false);
-  };
 
   const handleSaveSystem = () => {
     setEditingSystem(false);
@@ -38,76 +24,6 @@ const Settings = () => {
       </TouchableOpacity>
 
       <View style={styles.content}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Profile Settings</Text>
-          <TouchableOpacity
-            style={styles.settingsItem}
-            onPress={() => setEditingProfile(true)}
-            disabled={editingProfile}
-          >
-            <Text style={styles.settingLabel}>Username:</Text>
-            <TextInput
-              style={styles.settingInput}
-              placeholder="Enter username"
-              value={profileSettings.username}
-              onChangeText={(text) => setProfileSettings({ ...profileSettings, username: text })}
-              editable={editingProfile}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.settingsItem}
-            onPress={() => setEditingProfile(true)}
-            disabled={editingProfile}
-          >
-            <Text style={styles.settingLabel}>Email:</Text>
-            <TextInput
-              style={styles.settingInput}
-              placeholder="Enter email"
-              value={profileSettings.email}
-              onChangeText={(text) => setProfileSettings({ ...profileSettings, email: text })}
-              editable={editingProfile}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.settingsItem}
-            onPress={() => setEditingProfile(true)}
-            disabled={editingProfile}
-          >
-            <Text style={styles.settingLabel}>Phone Number:</Text>
-            <TextInput
-              style={styles.settingInput}
-              placeholder="Enter phone number"
-              value={profileSettings.phoneNumber}
-              onChangeText={(text) => setProfileSettings({ ...profileSettings, phoneNumber: text })}
-              editable={editingProfile}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.settingsItem}
-            onPress={() => setEditingProfile(true)}
-            disabled={editingProfile}
-          >
-            <Text style={styles.settingLabel}>Address:</Text>
-            <TextInput
-              style={styles.settingInput}
-              placeholder="Enter address"
-              value={profileSettings.address}
-              onChangeText={(text) => setProfileSettings({ ...profileSettings, address: text })}
-              editable={editingProfile}
-            />
-          </TouchableOpacity>
-          {editingProfile && (
-            <View style={styles.buttonsContainer}>
-              <TouchableOpacity style={styles.saveButton} onPress={handleSaveProfile}>
-                <Text style={styles.saveButtonText}>Save Changes</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.closeButton} onPress={() => setEditingProfile(false)}>
-                <Text style={styles.closeButtonText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
-
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: '#FFC42B' }]}>System Settings</Text>
           <TouchableOpacity

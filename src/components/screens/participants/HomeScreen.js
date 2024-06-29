@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Button,
   ScrollView,
   Image,
   ImageBackground,
@@ -14,6 +13,8 @@ import CustomHeader from "../../elements/CustomHeader";
 import Scrollview from "../../elements/ScrollViewScreens";
 import { getUser } from '../../../services/authentication/authServices';
 import { useFocusEffect } from "@react-navigation/native";
+import { Avatar } from "react-native-paper";
+import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 
 export default function HomeScreen({ navigation }) {
   const [user_name, setUsername] = useState("");
@@ -55,23 +56,29 @@ export default function HomeScreen({ navigation }) {
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.header}>
           <View style={styles.profileInfo}>
-            <View style={styles.photoContainer}>
-              <Button
-                title="+"
-                onPress={() => {}}
-                style={styles.addPhotoButton}
-              />
-            </View>
+            <Avatar.Image
+              size={50}
+              source={require("../../../../assets/organizer_images/organizer_profle.png")}
+              style={styles.profilePicture}
+            />
             <View>
               <Text style={styles.welcomeText}>Welcome,</Text>
               <Text style={styles.nameText}>{user_name}</Text>
             </View>
           </View>
-          <Text style={styles.locationText}>{country}</Text>
+          <View style={styles.locationContainer}> 
+            <Text style={styles.locationText}>{country}</Text>
+            <MaterialCommunityIcons
+                name="map-marker"
+                color="#FFC42B"
+                size={23}
+                style={styles.locationIcon}
+              />
+          </View>
         </View>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Popular Events</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={()=> navigation.navigate('Event')}>
             <Text style={styles.viewAllText}>VIEW ALL</Text>
           </TouchableOpacity>
         </View>
@@ -139,13 +146,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  photoContainer: {
-    width: 50,
-    height: 50,
-    backgroundColor: "#D9D9D9",
-    borderRadius: 25,
-    justifyContent: "center",
-    alignItems: "center",
+  profilePicture: {
+    backgroundColor: '#000',
     marginRight: 10,
   },
   addPhotoButton: {
@@ -160,9 +162,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "white",
   },
+  locationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   locationText: {
     fontSize: 14,
     color: "#FFC700",
+    textDecorationLine: "underline",
   },
   searchBarContainer: {
     marginBottom: 20,

@@ -67,7 +67,7 @@ const CustomDrawerContent = () => {
         label="Notification"
         screenName="Notifications"
       />
-      <DrawerItem icon="calendar" label="My Events" screenName="Events" />
+      <DrawerItem icon="calendar" label="My Events" screenName="FindEvent" />
       <DrawerItem
         icon="person"
         label="Attendee Tracker"

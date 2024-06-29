@@ -11,30 +11,31 @@ import {
   Image,
   ScrollView,
   Platform,
-  ActivityIndicator,
+  ActivityIndicator, // Import ActivityIndicator
 } from 'react-native';
-import { AntDesign } from '@expo/vector-icons'; // Import AntDesign icon
+import { AntDesign } from '@expo/vector-icons';
 import { Provider as PaperProvider } from 'react-native-paper';
 import NavBar from './nav';
-import { createEvent } from '../../../services/organizer/organizerServices';
+import { createEvent } from '../../../services/organizer/organizerServices'; // Adjust the import path as needed
 import { getUser } from '../../../services/authentication/authServices';
-import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system';
+import * as ImagePicker from 'expo-image-picker'; // Import expo-image-picker
+import * as FileSystem from 'expo-file-system'; // Import expo-file-system
 import { useFocusEffect } from '@react-navigation/native';
-import RNPickerSelect from 'react-native-picker-select';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import RNPickerSelect from 'react-native-picker-select'; // Import react-native-picker-select
+import DateTimePicker from '@react-native-community/datetimepicker'; // Import DateTimePicker
 
 const Create = ({ navigation }) => {
   const [eventName, setEventName] = useState('');
   const [eventDescription, setEventDescription] = useState('');
-  const [eventDate, setEventDate] = useState(null);
+  const [eventDate, setEventDate] = useState(new Date());
   const [eventTime, setEventTime] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const [eventLocation, setEventLocation] = useState('');
   const [organizer, setOrganizer] = useState('');
   const [participants, setParticipants] = useState('');
-  const [eventImage, setEventImage] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [eventImage, setEventImage] = useState(null); // State for storing the selected image URI
+  const [isLoading, setIsLoading] = useState(false); // State for loading indicator
 
   useFocusEffect(
     React.useCallback(() => {
@@ -54,7 +55,7 @@ const Create = ({ navigation }) => {
 
   const handleCreateEvent = async () => {
     try {
-      setIsLoading(true);
+      setIsLoading(true); // Start loading indicator
 
       const participantsArray = participants.split(',').map(email => email.trim());
       let base64Image = null;
@@ -68,7 +69,7 @@ const Create = ({ navigation }) => {
       const eventData = {
         event_name: eventName,
         event_description: eventDescription,
-        event_date: eventDate ? eventDate.toISOString().split('T')[0] : null,
+        event_date: eventDate.toISOString().split('T')[0],
         event_time: eventTime,
         event_location: eventLocation,
         event_status: 'Upcoming',
@@ -78,14 +79,14 @@ const Create = ({ navigation }) => {
       };
 
       await createEvent(eventData);
-      setIsLoading(false);
+      setIsLoading(false); // Stop loading indicator on success
       Alert.alert('Success', 'Event created successfully', [
         { text: 'OK', onPress: () => navigation.goBack() }
       ]);
       resetForm();
     } catch (error) {
       console.error('Event creation error:', error);
-      setIsLoading(false);
+      setIsLoading(false); // Stop loading indicator on error
       Alert.alert('Error', 'Failed to create event');
     }
   };
@@ -93,11 +94,11 @@ const Create = ({ navigation }) => {
   const resetForm = () => {
     setEventName("");
     setEventDescription("");
-    setEventDate(null);
+    setEventDate(new Date());
     setEventTime("");
     setEventLocation("");
     setParticipants("");
-    setEventImage(null);
+    setEventImage(null); // Reset image state
   };
 
   const handleImageUpload = async () => {
@@ -116,7 +117,7 @@ const Create = ({ navigation }) => {
       });
 
       if (!pickerResult.cancelled) {
-        setEventImage({ uri: pickerResult.assets[0].uri });
+        setEventImage({ uri: pickerResult.assets[0].uri }); // Use pickerResult.assets[0].uri
       }
     } catch (error) {
       console.error('ImagePicker Error:', error);
@@ -125,7 +126,7 @@ const Create = ({ navigation }) => {
   };
 
   const handleDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || eventDate || new Date();
+    const currentDate = selectedDate || eventDate;
     setShowDatePicker(Platform.OS === 'ios');
     setEventDate(currentDate);
   };
@@ -135,8 +136,9 @@ const Create = ({ navigation }) => {
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0} // Adjust this value if necessary
       >
+        {/* Burger icon to open sidebar */}
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.menuButton}>
           <AntDesign name="arrowleft" size={32} color="white" />
         </TouchableOpacity>
@@ -147,7 +149,7 @@ const Create = ({ navigation }) => {
               <ActivityIndicator size="large" color="#FFC42B" />
             </View>
           )}
-
+          
           <View style={styles.formContainer}>
             <Text style={styles.label}>Event Name</Text>
             <RNPickerSelect
@@ -165,6 +167,7 @@ const Create = ({ navigation }) => {
               value={eventName}
             />
 
+            {/* Add image upload */}
             <TouchableOpacity onPress={handleImageUpload} style={styles.imagePicker}>
               {eventImage ? (
                 <Image source={{ uri: eventImage.uri }} style={styles.eventImage} />
@@ -182,23 +185,20 @@ const Create = ({ navigation }) => {
               onChangeText={setEventDescription}
             />
 
-            <View style={styles.datePickerContainer}>
-              <Text style={styles.label}>Event Date</Text>
-              <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.datePicker}>
-                <Text style={styles.datePickerText}>
-                  {eventDate ? eventDate.toISOString().split('T')[0] : "Pick a date"}
-                </Text>
-                <AntDesign name="calendar" size={24} color="white" style={{ marginLeft: 10 }} />
-              </TouchableOpacity>
-              {showDatePicker && (
-                <DateTimePicker
-                  value={eventDate || new Date()}
-                  mode="date"
-                  display="default"
-                  onChange={handleDateChange}
-                />
-              )}
-            </View>
+            <Text style={styles.label}>Event Date</Text>
+            <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.datePicker}>
+            <Text Text style={styles.datePickerText}>
+                {eventDate ? eventDate.toISOString().split('T')[0] : "Pick a date"}
+              </Text>
+            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                value={eventDate}
+                mode="date"
+                display="default"
+                onChange={handleDateChange}
+              />
+            )}
 
             <Text style={styles.label}>Event Time</Text>
             <TextInput
@@ -208,6 +208,7 @@ const Create = ({ navigation }) => {
               value={eventTime}
               onChangeText={setEventTime}
             />
+
 
             <Text style={styles.label}>Event Location</Text>
             <TextInput
@@ -225,7 +226,7 @@ const Create = ({ navigation }) => {
               placeholderTextColor="#888"
               value={organizer}
               onChangeText={setOrganizer}
-              editable={false}
+              editable={false} // Prevent editing if needed
             />
 
             <Text style={styles.label}>Participants (comma-separated emails)</Text>
@@ -295,12 +296,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
   },
-  datePickerContainer: {
-    marginBottom: 10,
-  },
   datePicker: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: '#333',
     borderRadius: 5,
     paddingVertical: 8,
@@ -310,7 +306,6 @@ const styles = StyleSheet.create({
   datePickerText: {
     color: '#FFF',
     fontSize: 14,
-    flex: 1,
   },
   loadingContainer: {
     flex: 1,

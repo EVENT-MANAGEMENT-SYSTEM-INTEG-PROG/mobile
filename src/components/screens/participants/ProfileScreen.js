@@ -15,6 +15,7 @@ import Scrollview from "../../elements/ScrollViewScreens";
 import { AuthContext } from "../../../services/authentication/authContext";
 import { getUser, updateAccount } from '../../../services/authentication/authServices';
 import { useFocusEffect } from "@react-navigation/native";
+import { Avatar } from "react-native-paper";
 
 const ProfileScreen = ({ navigation }) => {
   const [first_name, setFirstname] = useState("");
@@ -110,10 +111,10 @@ const ProfileScreen = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.profileContainer}>
           <View style={styles.photoContainer}>
-            <Button
-              title="+"
-              onPress={() => {}}
-              style={styles.addPhotoButton}
+            <Avatar.Image
+              size={100}
+              source={require("../../../../assets/organizer_images/organizer_profle.png")}
+              style={{backgroundColor: '#000'}}
             />
           </View>
           <Text style={styles.serviceProviderName}>{first_name} {last_name}</Text>

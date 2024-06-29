@@ -78,6 +78,7 @@ const FeedbackParticipant = ({ route }) => {
       evaluation_rating: defaultRating,
       remarks,
       evaluation_status: "completed",
+      created_date_time: new Date().toISOString(),
     };
 
     try {

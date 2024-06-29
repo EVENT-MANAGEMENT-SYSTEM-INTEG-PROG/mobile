@@ -40,7 +40,6 @@ import EventsScreen from '../components/screens/participants/EventsScreen';
 import CalendarScreen from '../components/screens/participants/CalendarScreen';
 import JoinedEventsScreen from '../components/screens/participants/JoinedEventsScreen';
 import SelectedEventScreen from '../components/screens/participants/SelectedEventScreen';
-import FeedbackScreen from '../components/screens/participants/FeedbackScreen';
 import BookEventScreen from '../components/screens/participants/BookEventScreen';
 import FeedbackParticipant from '../components/screens/participants/FeedbackParticipant';
 import CopyLinkScreen from '../components/screens/participants/CopyLinkScreen';

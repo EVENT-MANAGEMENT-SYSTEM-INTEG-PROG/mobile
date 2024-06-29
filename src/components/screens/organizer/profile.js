@@ -13,6 +13,8 @@ import NavBar from './nav';
 import Toast from 'react-native-root-toast';
 import { getUser, updateAccount } from '../../../services/authentication/authServices';
 import { useFocusEffect } from '@react-navigation/native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import RNPickerSelect from 'react-native-picker-select';
 
 const Profile = ({ navigation }) => {
   const [profile, setProfile] = useState({
@@ -88,7 +90,7 @@ const Profile = ({ navigation }) => {
         </TouchableOpacity>
         
         <Image
-          source={require('../../../../assets/organizer_images/profile-picture.jpg')}
+          source={require('../../../../assets/organizer_images/organizer_profle.png')}
           style={styles.profilePicture}
         />
         
