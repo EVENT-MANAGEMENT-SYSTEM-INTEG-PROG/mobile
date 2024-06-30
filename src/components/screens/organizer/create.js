@@ -11,31 +11,32 @@ import {
   Image,
   ScrollView,
   Platform,
-  ActivityIndicator,
+  ActivityIndicator, // Import ActivityIndicator
 } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { Provider as PaperProvider } from 'react-native-paper';
 import NavBar from './nav';
-import { createEvent } from '../../../services/organizer/organizerServices'; // Adjust the import path as needed
+import { createEvent } from '../../../services/organizer/organizerServices';
+import { checkConflict } from '../../../services/organizer/organizerServices'; // Adjust the import path as needed
 import { getUser } from '../../../services/authentication/authServices';
-import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system';
+import * as ImagePicker from 'expo-image-picker'; // Import expo-image-picker
+import * as FileSystem from 'expo-file-system'; // Import expo-file-system
 import { useFocusEffect } from '@react-navigation/native';
-import RNPickerSelect from 'react-native-picker-select';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import RNPickerSelect from 'react-native-picker-select'; // Import react-native-picker-select
+import DateTimePicker from '@react-native-community/datetimepicker'; // Import DateTimePicker
 
 const Create = ({ navigation }) => {
   const [eventName, setEventName] = useState('');
   const [eventDescription, setEventDescription] = useState('');
-  const [eventDate, setEventDate] = useState(null);
-  const [eventTime, setEventTime] = useState(null);
+  const [eventDate, setEventDate] = useState(new Date());
+  const [eventTime, setEventTime] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [eventLocation, setEventLocation] = useState('');
   const [organizer, setOrganizer] = useState('');
   const [participants, setParticipants] = useState('');
-  const [eventImage, setEventImage] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [eventImage, setEventImage] = useState(null); // State for storing the selected image URI
+  const [isLoading, setIsLoading] = useState(false); // State for loading indicator
 
   useFocusEffect(
     React.useCallback(() => {
@@ -55,56 +56,80 @@ const Create = ({ navigation }) => {
 
   const handleCreateEvent = async () => {
     try {
-      setIsLoading(true);
-  
-      const participantsArray = participants.split(',').map(email => email.trim());
-      let base64Image = null;
-  
-      if (eventImage) {
-        const imageUri = eventImage.uri;
-        const imageBase64 = await FileSystem.readAsStringAsync(imageUri, { encoding: FileSystem.EncodingType.Base64 });
-        base64Image = `data:image/jpeg;base64,${imageBase64}`;
-      }
-  
-      const formattedDate = eventDate ? eventDate.toISOString().split('T')[0] : null;
-      const formattedTime = eventTime
-        ? `${eventTime.getHours().toString().padStart(2, '0')}:${eventTime.getMinutes().toString().padStart(2, '0')}:00`
-        : null;
-  
-      const eventData = {
-        event_name: eventName,
-        event_description: eventDescription,
-        event_date: formattedDate,
-        event_time: formattedTime,
-        event_location: eventLocation,
-        event_status: 'Upcoming',
-        organizer: organizer,
-        participants: participantsArray,
-        event_image: base64Image,
-      };
-  
-      await createEvent(eventData);
-      setIsLoading(false);
-      Alert.alert('Success', 'Event created successfully', [
-        { text: 'OK', onPress: () => navigation.goBack() }
-      ]);
-      resetForm();
-    } catch (error) {
-      console.error('Event creation error:', error);
-      setIsLoading(false);
-      Alert.alert('Error', 'Failed to create event');
-    }
-  };
+        setIsLoading(true); // Start loading indicator
 
-  const resetForm = () => {
-    setEventName('');
-    setEventDescription('');
-    setEventDate(null);
-    setEventTime(null);
-    setEventLocation('');
-    setParticipants('');
-    setEventImage(null);
-  };
+        // Prepare event data
+        const participantsArray = participants.split(',').map(email => email.trim());
+        let base64Image = null;
+
+        if (eventImage) {
+            const imageUri = eventImage.uri;
+            const imageBase64 = await FileSystem.readAsStringAsync(imageUri, { encoding: FileSystem.EncodingType.Base64 });
+            base64Image = `data:image/jpeg;base64,${imageBase64}`;
+        }
+
+        const formattedDate = eventDate ? eventDate.toISOString().split('T')[0] : null;
+        const formattedTime = eventTime
+            ? `${eventTime.getHours().toString().padStart(2, '0')}:${eventTime.getMinutes().toString().padStart(2, '0')}:00`
+            : null;
+
+        const eventData = {
+            event_name: eventName,
+            event_description: eventDescription,
+            event_date: formattedDate,
+            event_time: formattedTime, // Ensure event_time is included
+            event_location: eventLocation,
+            event_status: 'Upcoming',
+            organizer: organizer,
+            participants: participantsArray,
+            event_image: base64Image,
+        };
+
+        // Check for date conflicts only
+        const conflictResponse = await checkConflict({
+            event_date: eventData.event_date
+        });
+
+        if (conflictResponse.conflict) {
+            throw new Error('The selected date is already scheduled.');
+        }
+
+        // Proceed with event creation if no conflict
+        await createEvent(eventData);
+        setIsLoading(false); // Stop loading indicator
+        Alert.alert('Success', 'Event created successfully', [
+            { text: 'OK', onPress: () => navigation.goBack() }
+        ]);
+        resetForm();
+    } catch (error) {
+        console.error('Event creation error:', error.response ? error.response.data : error.message);
+        setIsLoading(false); // Stop loading indicator on error
+
+        // Determine the appropriate error message
+        const errorMessage = error.response && error.response.data
+            ? error.response.data.message
+            : error.message;
+
+        // Set custom title for conflict errors
+        const alertTitle = errorMessage === 'The selected date is already scheduled.' ? 'Creation Failed' : 'Error';
+
+        Alert.alert(alertTitle, errorMessage || 'Failed to create event');
+    }
+};
+
+
+    const resetForm = () => {
+      setEventName('');
+      setEventDescription('');
+      setEventDate(null);
+      setEventTime(null);
+      setEventLocation('');
+      setParticipants('');
+      setEventImage(null);
+    };
+
+
+
 
   const handleImageUpload = async () => {
     try {
@@ -122,7 +147,7 @@ const Create = ({ navigation }) => {
       });
 
       if (!pickerResult.cancelled) {
-        setEventImage({ uri: pickerResult.assets[0].uri });
+        setEventImage({ uri: pickerResult.assets[0].uri }); // Use pickerResult.assets[0].uri
       }
     } catch (error) {
       console.error('ImagePicker Error:', error);
@@ -159,7 +184,7 @@ const Create = ({ navigation }) => {
               <ActivityIndicator size="large" color="#FFC42B" />
             </View>
           )}
-
+          
           <View style={styles.formContainer}>
             <Text style={styles.label}>Event Name</Text>
             <RNPickerSelect
