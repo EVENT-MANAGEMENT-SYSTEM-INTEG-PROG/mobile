@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Modal, Pressable } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { AntDesign } from '@expo/vector-icons';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Agenda } from 'react-native-calendars';
 import NavBar from './nav';
-import { fetchSchedules } from '../../../services/organizer/organizerServices';
+import { getEvents } from '../../../services/organizer/organizerServices';
 
 const ViewSched = () => {
   const navigation = useNavigation();
@@ -12,44 +12,35 @@ const ViewSched = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
-  useEffect(() => {
-    const loadSchedule = async () => {
-      try {
-        const scheduleData = await fetchSchedules();
-        const formattedData = scheduleData.reduce((acc, item) => {
-          const date = item.schedule_date;
-          if (!acc[date]) {
-            acc[date] = [];
-          }
-          if (item.event) {
-            acc[date].push({
-              id: item.event.id,
-              name: item.event.event_name,
-              data: item.event.event_description,
-              time: item.event.event_time,
-              location: item.event.event_location,
-              organizer: item.event.organizer,
-            });
-          } else {
-            acc[date].push({
-              id: 'no-event',
-              name: 'No event',
-              data: 'No description available',
-              time: 'No time indicated',
-              location: 'No location',
-              organizer: 'No organizer',
-            });
-          }
-          return acc;
-        }, {});
-        setItems(formattedData);
-      } catch (error) {
-        console.error('Error fetching schedule data:', error);
-      }
-    };
+  useFocusEffect(
+    React.useCallback(() => {
+      loadEvents();
+    }, [])
+  );
 
-    loadSchedule();
-  }, []);
+  const loadEvents = async () => {
+    try {
+      const eventsData = await getEvents();
+      const formattedData = eventsData.reduce((acc, item) => {
+        const date = item.event_date;
+        if (!acc[date]) {
+          acc[date] = [];
+        }
+        acc[date].push({
+          id: item.event_id,
+          name: item.event_name,
+          data: item.event_description,
+          time: item.event_time,
+          location: item.event_location,
+          organizer: item.organizer,
+        });
+        return acc;
+      }, {});
+      setItems(formattedData);
+    } catch (error) {
+      console.error('Error fetching events data:', error);
+    }
+  };
 
   const handleItemPress = (event) => {
     setSelectedEvent(event);
@@ -63,52 +54,51 @@ const ViewSched = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.openDrawer()} style={styles.menuButton}>
-        <Ionicons name="menu" size={32} color="white" />
-      </TouchableOpacity>
+    <>
+      <View style={styles.container}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.menuButton}>
+          <AntDesign name="arrowleft" size={32} color="white" />
+        </TouchableOpacity>
+        <Text style={styles.header}>Schedule</Text>
+        <Text style={styles.text}>View your schedule below</Text>
+        <SafeAreaView style={styles.agendaContainer}>
+          <Agenda
+            items={items}
+            renderItem={(item) => (
+              <TouchableOpacity style={styles.item} onPress={() => handleItemPress(item)}>
+                <Text style={styles.itemText}>{item.name}</Text>
+                <Text style={styles.itemText}>{item.time}</Text>
+              </TouchableOpacity>
+            )}
+            renderEmptyData={renderEmptyData}
+          />
+        </SafeAreaView>
 
-      <Text style={styles.header}>Schedule</Text>
-      <Text style={styles.text}>View your schedule below</Text>
-
-      <SafeAreaView style={styles.agendaContainer}>
-        <Agenda
-          items={items}
-          renderItem={(item) => (
-            <TouchableOpacity style={styles.item} onPress={() => handleItemPress(item)}>
-              <Text style={styles.itemText}>{item.name}</Text>
-              <Text style={styles.itemText}>{item.time}</Text>
-            </TouchableOpacity>
-          )}
-          renderEmptyData={renderEmptyData}
-        />
-      </SafeAreaView>
-
-      <NavBar />
-
-      {/* Modal for Event Details */}
-      {selectedEvent && (
-        <Modal
-          visible={modalVisible}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={() => setModalVisible(false)}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>{selectedEvent.name}</Text>
-              <Text style={styles.modalText}>Description: {selectedEvent.data}</Text>
-              <Text style={styles.modalText}>Time: {selectedEvent.time}</Text>
-              <Text style={styles.modalText}>Location: {selectedEvent.location}</Text>
-              <Text style={styles.modalText}>Organizer: {selectedEvent.organizer}</Text>
-              <Pressable style={styles.modalCloseButton} onPress={() => setModalVisible(false)}>
-                <Text style={styles.modalCloseButtonText}>Close</Text>
-              </Pressable>
+        {/* Modal for Event Details */}
+        {selectedEvent && (
+          <Modal
+            visible={modalVisible}
+            animationType="slide"
+            transparent={true}
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>{selectedEvent.name}</Text>
+                <Text style={styles.modalText}>Description: {selectedEvent.data}</Text>
+                <Text style={styles.modalText}>Time: {selectedEvent.time}</Text>
+                <Text style={styles.modalText}>Location: {selectedEvent.location}</Text>
+                <Text style={styles.modalText}>Organizer: {selectedEvent.organizer}</Text>
+                <Pressable style={styles.modalCloseButton} onPress={() => setModalVisible(false)}>
+                  <Text style={styles.modalCloseButtonText}>Close</Text>
+                </Pressable>
+              </View>
             </View>
-          </View>
-        </Modal>
-      )}
-    </View>
+          </Modal>
+        )}
+      </View>
+      <NavBar />
+    </>
   );
 };
 
@@ -120,6 +110,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header: {
+    marginTop: 40,
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
