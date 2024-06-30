@@ -29,22 +29,6 @@ export const getRegistration = async () => {
     }
 };
 
-// export const fetchRegistrations = async (userId, date) => {
-//     try {
-//       const response = await axios.get('/api/registrations', {
-//         params: {
-//           user_id: userId,
-//           date: moment(date).format('YYYY-MM-DD'),
-//         },
-//       });
-//       return response.data;
-//     } catch (error) {
-//       console.error('Error fetching registrations:', error);
-//       throw error;
-//     }
-//   };
-
-
 export const getRegistrationById = async (id) => {
     try {
         const response = await api.get(`/registration/${id}`);
