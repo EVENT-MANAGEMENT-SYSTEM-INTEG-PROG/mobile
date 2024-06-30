@@ -35,4 +35,4 @@ yarn-error.*
 *.tsbuildinfo
 
 #Google Api
-googleApiKey.js
+src/constants/googleApiKey.js
