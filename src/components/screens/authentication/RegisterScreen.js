@@ -15,7 +15,7 @@ const RegisterScreen = () => {
   const [first_name, setFirstName] = useState("");
   const [last_name, setLastName] = useState("");
   const [gender, setGender] = useState("");
-  const [date_of_birth, setDateOfBirth] = useState(new Date());
+  const [date_of_birth, setDateOfBirth] = useState(null);
   const [country, setCountry] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -104,7 +104,7 @@ const RegisterScreen = () => {
     setFirstName("");
     setLastName("");
     setGender("");
-    setDateOfBirth(new Date());
+    setDateOfBirth(null);
     setCountry("");
     setEmail("");
     setPassword("");
@@ -204,11 +204,10 @@ const RegisterScreen = () => {
                 </Button>
                 {showDatePicker && (
                   <DateTimePicker
-                    value={date_of_birth}
+                    value={date_of_birth || new Date()}
                     mode="date"
                     display="default"
                     onChange={onDateChange}
-                    maximumDate={new Date()}
                   />
                 )}
                 <TextInput

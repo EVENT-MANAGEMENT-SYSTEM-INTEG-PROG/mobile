@@ -91,6 +91,7 @@ const AuthenticationStack = () => {
 
 //Organizer Priviledges
 function OrganizerStack() {
+    LogBox.ignoreAllLogs();
     return (
         <Drawer.Navigator drawerContent={props => <CustomDrawerContent {...props} />}>
             <Drawer.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false }} />
@@ -119,6 +120,7 @@ function OrganizerStack() {
 
 //Events - Participants
 function EventsTab() {
+    LogBox.ignoreAllLogs();
     return (
       <Stack.Navigator
         initialRouteName="EventsStack"
@@ -145,6 +147,7 @@ function EventsTab() {
 
 //Participants Priviledges
 function ParticipantsStack() {
+    LogBox.ignoreAllLogs();
     return (
         <Stack.Navigator
             screenOptions={{

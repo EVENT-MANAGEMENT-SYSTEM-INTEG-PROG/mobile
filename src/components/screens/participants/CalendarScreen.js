@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
   Modal, // Import Modal
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import moment from "moment";
 import Swiper from "react-native-swiper";
 import CustomHeader from "../../elements/CustomHeader";
@@ -67,9 +67,11 @@ export default function CalendarScreen() {
     }
   };
 
-  React.useEffect(() => {
-    fetchUserAndRegistrations();
-  }, [value]);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUserAndRegistrations();
+    }, [value])
+  );
 
   const weeks = React.useMemo(() => {
     const start = moment().add(week, "weeks").startOf("week");

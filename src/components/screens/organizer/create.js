@@ -202,7 +202,7 @@ const Create = ({ navigation }) => {
             </TouchableOpacity>
             {showDatePicker && (
               <DateTimePicker
-              value={eventDate || new Date()}
+                value={eventDate || new Date()}
                 mode="date"
                 display="default"
                 onChange={handleDateChange}
