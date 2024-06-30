@@ -80,13 +80,17 @@ export const notifyParticipants = async (id) => {
 
 export const checkConflict = async (eventData) => {
     try {
-        const response = await api.post('/event/check-conflict', eventData);
+        const response = await api.post('/event/check-conflict', {
+            event_date: eventData.event_date
+        });
         return response.data;
     } catch (error) {
         console.error('Check conflict error:', error);
         throw error;
     }
 };
+
+
 
 // export const createSchedule = async (scheduleData) => {
 //     try {
