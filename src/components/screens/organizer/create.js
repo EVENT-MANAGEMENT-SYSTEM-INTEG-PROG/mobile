@@ -28,8 +28,8 @@ import DateTimePicker from '@react-native-community/datetimepicker'; // Import D
 const Create = ({ navigation }) => {
   const [eventName, setEventName] = useState('');
   const [eventDescription, setEventDescription] = useState('');
-  const [eventDate, setEventDate] = useState(new Date());
-  const [eventTime, setEventTime] = useState('');
+  const [eventDate, setEventDate] = useState(null);
+  const [eventTime, setEventTime] = useState(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [eventLocation, setEventLocation] = useState('');
